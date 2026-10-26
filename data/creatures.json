@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "status": "planning_not_production",
+  "brand_status": "provisional",
+  "sources": {
+    "S01": "https://www.historiskmuseum.no/english/exhibitions/midgardr/",
+    "S02": "https://rammuseum.org.uk/wp-content/uploads/2022/05/GCUC-Ancient-Worlds-Ancient-Egypt.pdf",
+    "S03": "https://www.globalegyptianmuseum.org/glossary.aspx?id=296",
+    "S04": "https://www.metmuseum.org/art/collection/search/553736",
+    "S05": "https://www.metmuseum.org/art/collection/search/549275",
+    "S06": "https://www.metmuseum.org/art/collection/search/565105"
+  },
+  "creatures": [
+    {
+      "id": "N01",
+      "tradition": "norse",
+      "motif": "ratatoskr",
+      "display_name_ko": "라타토스크 메아리",
+      "nickname_proposal": "솔솔",
+      "source_ids": [
+        "S01"
+      ],
+      "research_status": "initial_source_review",
+      "fictional_adaptation": {
+        "role": "첫 안내자와 편지 전달",
+        "visual_direction": "잎꼬리와 씨앗 주머니",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "prototype_candidate": true,
+      "art_status": "not_created"
+    },
+    {
+      "id": "N02",
+      "tradition": "norse",
+      "motif": "sleipnir",
+      "display_name_ko": "슬레이프니르 메아리",
+      "nickname_proposal": "여덟발",
+      "source_ids": [
+        "S01"
+      ],
+      "research_status": "initial_source_review",
+      "fictional_adaptation": {
+        "role": "탐방길 연결",
+        "visual_direction": "작은 안개빛 말",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "prototype_candidate": false,
+      "art_status": "not_created"
+    },
+    {
+      "id": "N03",
+      "tradition": "norse",
+      "motif": "nidhoggr",
+      "display_name_ko": "뿌리용 메아리",
+      "nickname_proposal": "뿌룽",
+      "source_ids": [],
+      "research_status": "research_pending",
+      "fictional_adaptation": {
+        "role": "뿌리 틈 흔적 탐색",
+        "visual_direction": "이끼 등과 뿌리뿔",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "prototype_candidate": false,
+      "art_status": "not_created"
+    },
+    {
+      "id": "E01",
+      "tradition": "egyptian",
+      "motif": "bennu",
+      "display_name_ko": "베누 메아리",
+      "nickname_proposal": "여울",
+      "source_ids": [
+        "S02",
+        "S03"
+      ],
+      "research_status": "initial_source_review",
+      "fictional_adaptation": {
+        "role": "습지 관찰",
+        "visual_direction": "은은한 새벽빛 깃",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "prototype_candidate": true,
+      "art_status": "not_created"
+    },
+    {
+      "id": "E02",
+      "tradition": "egyptian",
+      "motif": "scarab",
+      "display_name_ko": "스카라브 메아리",
+      "nickname_proposal": "해굴",
+      "source_ids": [
+        "S04",
+        "S05"
+      ],
+      "research_status": "initial_source_review",
+      "fictional_adaptation": {
+        "role": "꾸미기 재료 운반",
+        "visual_direction": "빛 구슬을 굴리는 작은 딱정벌레",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "prototype_candidate": true,
+      "art_status": "not_created"
+    },
+    {
+      "id": "E03",
+      "tradition": "egyptian",
+      "motif": "sphinx",
+      "display_name_ko": "스핑크스 메아리",
+      "nickname_proposal": "모래잠",
+      "source_ids": [
+        "S06"
+      ],
+      "research_status": "initial_source_review",
+      "fictional_adaptation": {
+        "role": "고요한 관찰 동료",
+        "visual_direction": "작은 인간형 얼굴과 사자 몸",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "prototype_candidate": false,
+      "art_status": "not_created"
+    }
+  ]
+}

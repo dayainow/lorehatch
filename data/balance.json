@@ -1,7 +1,6 @@
 {
   "status": "untested_design_proposal",
-  "version": "0.2",
-  "warmth_per_active_minute": 1,
+  "version": "0.3",
   "incubation_minutes": 25,
   "growth_minutes": 75,
   "daily_earning_cap_minutes": 150,
@@ -14,5 +13,6 @@
     "G01",
     "G02"
   ],
-  "mvp_basic_sprite_frames": 14
+  "mvp_basic_sprite_frames": 14,
+  "progress_source": "active_session_seconds"
 }

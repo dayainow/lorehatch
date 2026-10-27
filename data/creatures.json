@@ -23,7 +23,7 @@
       "research_status": "original_creation",
       "scope": "mvp",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "잎날개·가지뿔·이끼색",
         "growth_stages": [
           "young",
@@ -42,7 +42,7 @@
       "research_status": "original_creation",
       "scope": "collection",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "불씨꼬리·짧은 뿔",
         "growth_stages": [
           "young",
@@ -56,42 +56,44 @@
       "collection": "greek",
       "origin": "greek",
       "motif": "pegasus",
-      "display_name_ko": "날개말",
+      "display_name_ko": "페가수스",
       "source_ids": [
         "S08"
       ],
       "research_status": "initial_source_review",
       "scope": "mvp",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "상아색·푸른 갈기·두 날개",
         "growth_stages": [
           "young",
           "companion"
         ]
       },
-      "art_status": "concept_only"
+      "art_status": "concept_only",
+      "short_description_ko": "날개 달린 말"
     },
     {
       "id": "G02",
       "collection": "greek",
       "origin": "greek",
       "motif": "cerberus",
-      "display_name_ko": "세머리 강아지",
+      "display_name_ko": "케르베로스",
       "source_ids": [
         "S09"
       ],
       "research_status": "initial_source_review",
       "scope": "mvp",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "한 몸·세 머리·네 다리",
         "growth_stages": [
           "young",
           "companion"
         ]
       },
-      "art_status": "concept_only"
+      "art_status": "concept_only",
+      "short_description_ko": "세 머리 강아지"
     },
     {
       "id": "A01",
@@ -103,7 +105,7 @@
       "research_status": "research_pending",
       "scope": "collection",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "아홉 꼬리의 여우",
         "growth_stages": [
           "young",
@@ -122,7 +124,7 @@
       "research_status": "research_pending",
       "scope": "collection",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "돌빛 몸·구름갈기",
         "growth_stages": [
           "young",
@@ -143,7 +145,7 @@
       "research_status": "initial_source_review",
       "scope": "collection",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "큰 꼬리·씨앗 주머니",
         "growth_stages": [
           "young",
@@ -164,7 +166,7 @@
       "research_status": "initial_source_review",
       "scope": "collection",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "여덟 다리·안개빛",
         "growth_stages": [
           "young",
@@ -186,7 +188,7 @@
       "research_status": "initial_source_review",
       "scope": "collection",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "긴 목·두 갈래 머리깃",
         "growth_stages": [
           "young",
@@ -208,7 +210,7 @@
       "research_status": "initial_source_review",
       "scope": "collection",
       "fictional_adaptation": {
-        "birth": "story_egg",
+        "birth": "egg",
         "visual_direction": "둥근 등판·빛 구슬",
         "growth_stages": [
           "young",
@@ -220,7 +222,7 @@
     {
       "id": "N03",
       "motif": "nidhoggr",
-      "display_name_ko": "뿌리용 메아리",
+      "display_name_ko": "뿌리용",
       "nickname_proposal": "뿌룽",
       "source_ids": [],
       "research_status": "research_pending",
@@ -231,7 +233,7 @@
           "young",
           "companion"
         ],
-        "birth": "story_egg"
+        "birth": "egg"
       },
       "art_status": "not_created",
       "scope": "deferred",
@@ -241,7 +243,7 @@
     {
       "id": "E03",
       "motif": "sphinx",
-      "display_name_ko": "스핑크스 메아리",
+      "display_name_ko": "스핑크스",
       "nickname_proposal": "모래잠",
       "source_ids": [
         "S06"
@@ -254,7 +256,7 @@
           "young",
           "companion"
         ],
-        "birth": "story_egg"
+        "birth": "egg"
       },
       "art_status": "not_created",
       "scope": "deferred",
@@ -262,5 +264,5 @@
       "origin": "egyptian"
     }
   ],
-  "content_version": "0.2"
+  "content_version": "0.3"
 }

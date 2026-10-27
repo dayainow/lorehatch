@@ -12,7 +12,7 @@ idle → incubating → hatch_ready → raising → growth_ready → collection_
 사용자가 확인할 때 hatch_ready/growth_ready 연출을 재생한다. 도감 등록과 지급은 한 트랜잭션으로 처리. 개체 ID와 완료 이벤트 ID로 재생과 지급을 분리한다.
 
 콘텐츠: `data/creatures.json`의 ID/출처/창작 설명. 현재 schema v2는 기획 데이터이며 앱 저장 규격과 다름.
-세이브 제안: schemaVersion, contentVersion, instances[{id,speciesId,stage,progressSeconds,hatchedAt,grownAt,nickname}], activeEgg, raisingInstanceId, displayedInstanceId, warmthBankSeconds, dailyEarnedSeconds, dailyBucket, tutorialClaimed, processedCompletionIds, settings.
+세이브 제안: schemaVersion, contentVersion, instances[{id,speciesId,stage,progressSeconds,hatchedAt,grownAt,nickname}], activeEgg, raisingInstanceId, displayedInstanceId, savedProgressSeconds, dailyEarnedSeconds, dailyBucket, tutorialClaimed, processedCompletionIds, settings.
 
 ## 시간 처리
 

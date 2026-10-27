@@ -9,7 +9,9 @@
 - Implement a scoped vertical slice before expanding the bestiary. Preserve source IDs when updating content.
 - No automatic deployment, purchase, external outreach, or licensing claims from the planning documents.
 
-- Current direction is v0.2: egg hatching, low-resolution pixel companions, 3-species MVP and 10-species collection target. No exploration quests in MVP.
+- Current direction is v0.3: egg hatching, low-resolution pixel companions, 3-species MVP and 10-species collection target. No exploration quests in MVP.
 - Treat generated concept sheets as reference, never as validated 32x32 sprite sheets.
 - Balance values are hypotheses. Keep docs and data/balance.json consistent.
 - Korean working name 환수정원 is provisional; repository identifier remains lorehatch.
+
+- User-facing Korean terminology follows docs/11-language.md. Do not invent fantasy currencies or rename familiar myth creatures into verbose compounds.

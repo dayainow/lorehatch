@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "planning_not_production",
   "brand_status": "provisional",
   "sources": {
@@ -8,117 +8,238 @@
     "S03": "https://www.globalegyptianmuseum.org/glossary.aspx?id=296",
     "S04": "https://www.metmuseum.org/art/collection/search/553736",
     "S05": "https://www.metmuseum.org/art/collection/search/549275",
-    "S06": "https://www.metmuseum.org/art/collection/search/565105"
+    "S06": "https://www.metmuseum.org/art/collection/search/565105",
+    "S08": "https://www.theoi.com/Ther/HipposPegasos.html",
+    "S09": "https://www.theoi.com/Ther/KuonKerberos.html"
   },
   "creatures": [
     {
-      "id": "N01",
-      "tradition": "norse",
-      "motif": "ratatoskr",
-      "display_name_ko": "라타토스크 메아리",
-      "nickname_proposal": "솔솔",
-      "source_ids": [
-        "S01"
-      ],
-      "research_status": "initial_source_review",
+      "id": "D01",
+      "collection": "dragon",
+      "origin": "original",
+      "motif": "forest_dragon",
+      "display_name_ko": "숲용",
+      "source_ids": [],
+      "research_status": "original_creation",
+      "scope": "mvp",
       "fictional_adaptation": {
-        "role": "첫 안내자와 편지 전달",
-        "visual_direction": "잎꼬리와 씨앗 주머니",
+        "birth": "story_egg",
+        "visual_direction": "잎날개·가지뿔·이끼색",
         "growth_stages": [
           "young",
           "companion"
         ]
       },
-      "prototype_candidate": true,
+      "art_status": "concept_only"
+    },
+    {
+      "id": "D02",
+      "collection": "dragon",
+      "origin": "original",
+      "motif": "fire_dragon",
+      "display_name_ko": "불꽃용",
+      "source_ids": [],
+      "research_status": "original_creation",
+      "scope": "collection",
+      "fictional_adaptation": {
+        "birth": "story_egg",
+        "visual_direction": "불씨꼬리·짧은 뿔",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "art_status": "not_created"
+    },
+    {
+      "id": "G01",
+      "collection": "greek",
+      "origin": "greek",
+      "motif": "pegasus",
+      "display_name_ko": "날개말",
+      "source_ids": [
+        "S08"
+      ],
+      "research_status": "initial_source_review",
+      "scope": "mvp",
+      "fictional_adaptation": {
+        "birth": "story_egg",
+        "visual_direction": "상아색·푸른 갈기·두 날개",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "art_status": "concept_only"
+    },
+    {
+      "id": "G02",
+      "collection": "greek",
+      "origin": "greek",
+      "motif": "cerberus",
+      "display_name_ko": "세머리 강아지",
+      "source_ids": [
+        "S09"
+      ],
+      "research_status": "initial_source_review",
+      "scope": "mvp",
+      "fictional_adaptation": {
+        "birth": "story_egg",
+        "visual_direction": "한 몸·세 머리·네 다리",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "art_status": "concept_only"
+    },
+    {
+      "id": "A01",
+      "collection": "east_asia",
+      "origin": "korean_folklore",
+      "motif": "gumiho",
+      "display_name_ko": "구미호",
+      "source_ids": [],
+      "research_status": "research_pending",
+      "scope": "collection",
+      "fictional_adaptation": {
+        "birth": "story_egg",
+        "visual_direction": "아홉 꼬리의 여우",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "art_status": "not_created"
+    },
+    {
+      "id": "A02",
+      "collection": "east_asia",
+      "origin": "korean_folklore",
+      "motif": "haetae",
+      "display_name_ko": "해태",
+      "source_ids": [],
+      "research_status": "research_pending",
+      "scope": "collection",
+      "fictional_adaptation": {
+        "birth": "story_egg",
+        "visual_direction": "돌빛 몸·구름갈기",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "art_status": "not_created"
+    },
+    {
+      "id": "N01",
+      "collection": "norse",
+      "origin": "norse",
+      "motif": "ratatoskr",
+      "display_name_ko": "전령 다람쥐",
+      "source_ids": [
+        "S01"
+      ],
+      "research_status": "initial_source_review",
+      "scope": "collection",
+      "fictional_adaptation": {
+        "birth": "story_egg",
+        "visual_direction": "큰 꼬리·씨앗 주머니",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
       "art_status": "not_created"
     },
     {
       "id": "N02",
-      "tradition": "norse",
+      "collection": "norse",
+      "origin": "norse",
       "motif": "sleipnir",
-      "display_name_ko": "슬레이프니르 메아리",
-      "nickname_proposal": "여덟발",
+      "display_name_ko": "여덟발 말",
       "source_ids": [
         "S01"
       ],
       "research_status": "initial_source_review",
+      "scope": "collection",
       "fictional_adaptation": {
-        "role": "탐방길 연결",
-        "visual_direction": "작은 안개빛 말",
+        "birth": "story_egg",
+        "visual_direction": "여덟 다리·안개빛",
         "growth_stages": [
           "young",
           "companion"
         ]
       },
-      "prototype_candidate": false,
+      "art_status": "not_created"
+    },
+    {
+      "id": "E01",
+      "collection": "egyptian",
+      "origin": "egyptian",
+      "motif": "bennu",
+      "display_name_ko": "새벽새",
+      "source_ids": [
+        "S02",
+        "S03"
+      ],
+      "research_status": "initial_source_review",
+      "scope": "collection",
+      "fictional_adaptation": {
+        "birth": "story_egg",
+        "visual_direction": "긴 목·두 갈래 머리깃",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
+      "art_status": "not_created"
+    },
+    {
+      "id": "E02",
+      "collection": "egyptian",
+      "origin": "egyptian",
+      "motif": "scarab",
+      "display_name_ko": "태양 딱정벌레",
+      "source_ids": [
+        "S04",
+        "S05"
+      ],
+      "research_status": "initial_source_review",
+      "scope": "collection",
+      "fictional_adaptation": {
+        "birth": "story_egg",
+        "visual_direction": "둥근 등판·빛 구슬",
+        "growth_stages": [
+          "young",
+          "companion"
+        ]
+      },
       "art_status": "not_created"
     },
     {
       "id": "N03",
-      "tradition": "norse",
       "motif": "nidhoggr",
       "display_name_ko": "뿌리용 메아리",
       "nickname_proposal": "뿌룽",
       "source_ids": [],
       "research_status": "research_pending",
       "fictional_adaptation": {
-        "role": "뿌리 틈 흔적 탐색",
+        "role": "보류",
         "visual_direction": "이끼 등과 뿌리뿔",
         "growth_stages": [
           "young",
           "companion"
-        ]
+        ],
+        "birth": "story_egg"
       },
-      "prototype_candidate": false,
-      "art_status": "not_created"
-    },
-    {
-      "id": "E01",
-      "tradition": "egyptian",
-      "motif": "bennu",
-      "display_name_ko": "베누 메아리",
-      "nickname_proposal": "여울",
-      "source_ids": [
-        "S02",
-        "S03"
-      ],
-      "research_status": "initial_source_review",
-      "fictional_adaptation": {
-        "role": "습지 관찰",
-        "visual_direction": "은은한 새벽빛 깃",
-        "growth_stages": [
-          "young",
-          "companion"
-        ]
-      },
-      "prototype_candidate": true,
-      "art_status": "not_created"
-    },
-    {
-      "id": "E02",
-      "tradition": "egyptian",
-      "motif": "scarab",
-      "display_name_ko": "스카라브 메아리",
-      "nickname_proposal": "해굴",
-      "source_ids": [
-        "S04",
-        "S05"
-      ],
-      "research_status": "initial_source_review",
-      "fictional_adaptation": {
-        "role": "꾸미기 재료 운반",
-        "visual_direction": "빛 구슬을 굴리는 작은 딱정벌레",
-        "growth_stages": [
-          "young",
-          "companion"
-        ]
-      },
-      "prototype_candidate": true,
-      "art_status": "not_created"
+      "art_status": "not_created",
+      "scope": "deferred",
+      "collection": "norse",
+      "origin": "norse"
     },
     {
       "id": "E03",
-      "tradition": "egyptian",
       "motif": "sphinx",
       "display_name_ko": "스핑크스 메아리",
       "nickname_proposal": "모래잠",
@@ -127,15 +248,19 @@
       ],
       "research_status": "initial_source_review",
       "fictional_adaptation": {
-        "role": "고요한 관찰 동료",
+        "role": "보류",
         "visual_direction": "작은 인간형 얼굴과 사자 몸",
         "growth_stages": [
           "young",
           "companion"
-        ]
+        ],
+        "birth": "story_egg"
       },
-      "prototype_candidate": false,
-      "art_status": "not_created"
+      "art_status": "not_created",
+      "scope": "deferred",
+      "collection": "egyptian",
+      "origin": "egyptian"
     }
-  ]
+  ],
+  "content_version": "0.2"
 }

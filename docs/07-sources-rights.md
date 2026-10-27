@@ -12,7 +12,7 @@
 - S06: The Met, Scarab with Representation of a Sphinx. 이집트 스핑크스와 왕권 맥락. https://www.metmuseum.org/art/collection/search/565105
 - S07: The Met, Think Sphinx. 인간 머리·사자 몸의 형상 참고. https://www.metmuseum.org/-/media/files/learn/family-map-and-guides/middle-kingdom-family-guide.pdf
 
-이 자료들은 초기 기획 근거다. Níðhöggr의 설명은 추가 검증이 필요하다. S02 등 자료의 세부 도판·원전 전문은 아트 제작 전에 직접 대조한다. 현재 캐릭터 외형·별명·성장·능력은 모두 창작 제안이다.
+이 자료들은 초기 기획 근거다. Níðhöggr의 설명은 추가 검증이 필요하다. S02 등 자료의 세부 도판·원전 전문은 아트 제작 전에 직접 대조한다. 현재 캐릭터 외형·별명·성장·능력은 모두 창작 제안이다. 동아시아 2종의 상세 전승 설명은 추가 조사 전이다.
 
 ## 브랜드 검색 근거
 
@@ -34,3 +34,11 @@
 - 확인: 공개 공식 자료의 기본 모티프, 일부 이름 충돌, 벤치마크 제품의 공식 설명.
 - 제안: 세계관, 메아리 환수, 이름, 콘텐츠 수, 제품 흐름, 가격 테스트, 개발 스택.
 - 미검증: 상표/도메인, 최종 원전 감수, 구현·성능, 사용자 유지율, 유료 전환, 수익성.
+
+## v0.2 추가 자료와 에셋
+
+- S08: Theoi, Pegasus. https://www.theoi.com/Ther/HipposPegasos.html
+- S09: Theoi, Cerberus. https://www.theoi.com/Ther/KuonKerberos.html
+- 환수정원 이름은 선행 조사 전의 새 작업명.
+- assets/concepts/pixel-direction-v1.png는 내장 이미지 생성 도구를 통한 오리지널 방향 시안. 기존 캐릭터 참고 이미지 자체는 미포함. 생성물이라고 유사성/권리 검토가 자동 완료되는 것은 아님. 최종 도트는 별도 제작·검수 필요.
+- v0.2는 탐방을 제외하고 모든 환수의 게임상 탄생을 전승의 알로 통일. 알 설정은 원전 설명과 별개.

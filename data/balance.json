@@ -1,0 +1,18 @@
+{
+  "status": "untested_design_proposal",
+  "version": "0.2",
+  "warmth_per_active_minute": 1,
+  "incubation_minutes": 25,
+  "growth_minutes": 75,
+  "daily_earning_cap_minutes": 150,
+  "tutorial_instant_first_hatch": true,
+  "offline_earning": false,
+  "overflow_policy": "bank_until_next_target",
+  "duplicate_species_in_mvp": false,
+  "mvp_species_ids": [
+    "D01",
+    "G01",
+    "G02"
+  ],
+  "mvp_basic_sprite_frames": 14
+}

@@ -8,7 +8,7 @@
 
 ## GitHub와 배포
 
-현재 origin은 dayainow/lorehatch이며 2026-10-29 조회 기준 비공개다. 공개 전환 시 기획 문서와 과거 커밋도 외부에 보이므로 사용자 결정 후 전환한다. 라이선스는 미선정이다. 공개 소스의 열람과 자유 재배포 권한은 별개다.
+2026-10-29 사용자 승인 후 dayainow/lorehatch 전체를 공개로 전환하고 PR #1을 main에 병합했다. 기획 문서와 과거 커밋도 공개된다. GitHub Pages 배포가 완료되어 https://dayainow.github.io/lorehatch/ 에서 제공한다. 라이선스는 미선정이다. 공개 소스의 열람과 자유 재배포 권한은 별개다.
 
 1. 공개 전에 README, 과거 커밋, 출처·권리 문서를 검토한다. 비공개 자료가 없는지 확인한다.
 2. 사용자 결정 후 저장소 공개 여부를 변경한다. 외부 방문자의 Star·이슈 접근을 로그아웃 상태로 확인한다.
@@ -27,7 +27,7 @@
 
 설치·로그인 없이 체험할 수 있고, 진행은 브라우저에 저장됩니다. 현재는 정원 화면이 보일 때만 시간이 쌓여요.
 
-[검증된 체험 URL 삽입]
+https://dayainow.github.io/lorehatch/?mode=demo
 GitHub: https://github.com/dayainow/lorehatch
 
 마음에 드시면 GitHub Star로 응원해 주세요. 첫 알을 고르거나 집중을 시작할 때 헷갈린 점도 듣고 싶어요.
@@ -40,7 +40,7 @@ Choose an egg, start a focus session, and collect three companions with baby and
 
 This browser alpha keeps progress locally, with no account or analytics SDK. Time accrues while the garden tab is visible.
 
-[Insert verified demo URL]
+https://dayainow.github.io/lorehatch/?mode=demo
 GitHub: https://github.com/dayainow/lorehatch
 
 If you enjoy it, a GitHub star would mean a lot. I'd love to hear where the first hatch or focus flow felt confusing.

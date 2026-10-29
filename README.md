@@ -6,11 +6,11 @@
 
 ![환수정원 브라우저 알파의 실제 화면](docs/screenshots/alpha-desktop.png)
 
-**v0.5 브라우저 알파 · 공개 배포 준비 중**
+**v0.5 브라우저 알파 · 지금 체험할 수 있어요**
 
 [GitHub에서 Star로 응원하기](https://github.com/dayainow/lorehatch) · [사용 후기·문제 제보](https://github.com/dayainow/lorehatch/issues)
 
-온라인 체험 주소는 배포 확인 후 추가합니다. 현재 저장소의 공개 여부에 따라 외부 방문자의 GitHub 접근이 제한될 수 있습니다.
+🌱 **[정원 시작하기](https://dayainow.github.io/lorehatch/)** · **[30초 성장 체험](https://dayainow.github.io/lorehatch/?mode=demo)**
 
 ## 어떤 정원인가요?
 

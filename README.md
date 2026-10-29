@@ -6,7 +6,7 @@
 
 ![환수정원 브라우저 알파의 실제 화면](docs/screenshots/alpha-desktop.png)
 
-**v0.5 브라우저 알파 · 지금 체험할 수 있어요**
+**v0.5.1 브라우저 알파 · 지금 체험할 수 있어요**
 
 [GitHub에서 Star로 응원하기](https://github.com/dayainow/lorehatch) · [사용 후기·문제 제보](https://github.com/dayainow/lorehatch/issues)
 
@@ -17,6 +17,7 @@
 - **세 친구, 여섯 모습.** 숲용·페가수스·케르베로스 모티프의 펫 3종, 아기와 성장 단계.
 - **짧게 먼저 체험.** 빠른 체험은 첫 부화 즉시, 성장 30초. 일반 정원과 별도로 저장됩니다.
 - **내 브라우저에 보관.** 계정 없이 시작하고, JSON 파일로 진행을 내보내거나 복구합니다.
+- **서로 다른 성격과 이야기.** 성격·좋아하는 것·쓰다듬기 반응 문구, 실제 만난 날과 성장한 날, 창작 설정과 전승 출처를 도감에서 확인합니다.
 - **내 펫과 파트너.** 별명, 파트너 선택, 소품, 동작 줄이기, 작은 화면 모드.
 - **함께 나누기.** 모은 펫을 이미지로 저장하거나 정원 링크를 공유합니다. 공유 카드에는 별명과 집중 시간이 포함되지 않습니다.
 
@@ -67,5 +68,7 @@ GitHub Actions는 push와 PR에서 검증합니다. Pages 배포는 `Publish bro
 환수정원·Lorehatch와 캐릭터 이름은 작업명입니다. 이름 검색은 상표 등록 가능성 확인이 아닙니다. 스프라이트는 직접 작성한 SVG 픽셀 에셋이며 [기존 콘셉트 이미지](assets/concepts/pixel-direction-v1.png)는 참고용입니다.
 
 라이선스 미선정. 저장소 공개가 코드·문서·캐릭터의 자유 재배포를 허용하지는 않습니다. [출처·권리 기록](docs/07-sources-rights.md)을 참고하세요.
+
+확장 계획: [10종 상세 설계](docs/15-collection-design.md) · [공개 알파 검증안](docs/16-alpha-playtest.md) · [7종 구조화 명세](data/collection-plan.json)
 
 기획 기록: [제품](docs/04-product.md) · [도감](docs/03-bestiary.md) · [용어](docs/11-language.md) · [기술](docs/09-technical.md) · [로드맵](docs/06-roadmap.md)

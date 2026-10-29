@@ -10,7 +10,8 @@
     "S05": "https://www.metmuseum.org/art/collection/search/549275",
     "S06": "https://www.metmuseum.org/art/collection/search/565105",
     "S08": "https://www.theoi.com/Ther/HipposPegasos.html",
-    "S09": "https://www.theoi.com/Ther/KuonKerberos.html"
+    "S09": "https://www.theoi.com/Ther/KuonKerberos.html",
+    "S10": "https://kh.or.kr/brd/board/741/L/menu/740?bbIdx=111410&brdType=R&searchField=&searchText=&thisPage=1"
   },
   "creatures": [
     {
@@ -30,7 +31,7 @@
           "companion"
         ]
       },
-      "art_status": "concept_only"
+      "art_status": "code_authored_svg_prototype"
     },
     {
       "id": "D02",
@@ -70,7 +71,7 @@
           "companion"
         ]
       },
-      "art_status": "concept_only",
+      "art_status": "code_authored_svg_prototype",
       "short_description_ko": "날개 달린 말"
     },
     {
@@ -92,7 +93,7 @@
           "companion"
         ]
       },
-      "art_status": "concept_only",
+      "art_status": "code_authored_svg_prototype",
       "short_description_ko": "세 머리 강아지"
     },
     {
@@ -120,8 +121,10 @@
       "origin": "korean_folklore",
       "motif": "haetae",
       "display_name_ko": "해태",
-      "source_ids": [],
-      "research_status": "research_pending",
+      "source_ids": [
+        "S10"
+      ],
+      "research_status": "initial_source_review",
       "scope": "collection",
       "fictional_adaptation": {
         "birth": "egg",
@@ -264,5 +267,5 @@
       "origin": "egyptian"
     }
   ],
-  "content_version": "0.3"
+  "content_version": "0.6-planning"
 }

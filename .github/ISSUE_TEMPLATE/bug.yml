@@ -1,0 +1,27 @@
+name: 문제 제보
+description: 브라우저와 재현 순서를 알려주세요.
+title: '[문제] '
+body:
+  - type: markdown
+    attributes:
+      value: 별명·저장 파일·개인 정보를 공개 이슈에 첨부하지 마세요.
+  - type: input
+    id: browser
+    attributes:
+      label: 브라우저와 기기
+      placeholder: 예) macOS Safari, Android Chrome
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 순서와 기대한 결과
+      description: 일반 정원인지 빠른 체험인지도 알려주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 결과
+    validations:
+      required: true

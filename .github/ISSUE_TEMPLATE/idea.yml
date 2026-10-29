@@ -1,0 +1,10 @@
+name: 사용 후기·제안
+description: 첫 부화와 성장을 경험하며 느낀 점을 알려주세요.
+body:
+  - type: textarea
+    id: experience
+    attributes:
+      label: 어떤 부분이 좋았거나 헷갈렸나요?
+      description: 다음 알도 키워보고 싶었는지 알려주시면 도움이 됩니다.
+    validations:
+      required: true

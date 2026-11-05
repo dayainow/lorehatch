@@ -402,6 +402,138 @@
       "fictional_adaptation": {
         "visual_direction": "해가 지면 꼬리를 담요처럼 둘러요."
       }
+    },
+    {
+      "id": "C01",
+      "display_name_ko": "거품물개",
+      "origin": "original",
+      "motif": "seal",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "턱 아래 작은 거품을 베고 졸아요."
+      }
+    },
+    {
+      "id": "C02",
+      "display_name_ko": "산호게",
+      "origin": "original",
+      "motif": "crab",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "작은 집게 끝이 산호처럼 붉어요."
+      }
+    },
+    {
+      "id": "C03",
+      "display_name_ko": "해초해마",
+      "origin": "original",
+      "motif": "seahorse",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "머리의 해초 한 가닥이 흔들려요."
+      }
+    },
+    {
+      "id": "C04",
+      "display_name_ko": "조개문어",
+      "origin": "original",
+      "motif": "octopus",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "머리에 작은 조개껍데기를 썼어요."
+      }
+    },
+    {
+      "id": "C05",
+      "display_name_ko": "모래별",
+      "origin": "original",
+      "motif": "starfish",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "다섯 팔 끝에 작은 불빛이 맺혀요."
+      }
+    },
+    {
+      "id": "C06",
+      "display_name_ko": "야자오리",
+      "origin": "original",
+      "motif": "duck",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "머리에 야자잎 한 장을 얹었어요."
+      }
+    },
+    {
+      "id": "F01",
+      "display_name_ko": "민들레양",
+      "origin": "original",
+      "motif": "sheep",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "솜털 사이에 민들레 씨앗이 숨어요."
+      }
+    },
+    {
+      "id": "F02",
+      "display_name_ko": "빗방울코끼리",
+      "origin": "original",
+      "motif": "elephant",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "짧은 코 끝에 물방울이 달려요."
+      }
+    },
+    {
+      "id": "F03",
+      "display_name_ko": "온돌곰",
+      "origin": "original",
+      "motif": "bear",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "배의 둥근 털이 따뜻해요."
+      }
+    },
+    {
+      "id": "F04",
+      "display_name_ko": "꽃리본고양이",
+      "origin": "original",
+      "motif": "cat",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "한쪽 귀에 작은 꽃잎을 달았어요."
+      }
+    },
+    {
+      "id": "F05",
+      "display_name_ko": "햇꿀벌",
+      "origin": "original",
+      "motif": "bee",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "작은 배에 꿀빛 줄 하나가 있어요."
+      }
+    },
+    {
+      "id": "F06",
+      "display_name_ko": "이슬친칠라",
+      "origin": "original",
+      "motif": "chinchilla",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "둥근 귀 끝에 이슬이 맺혀요."
+      }
     }
   ],
   "content_version": "0.6-planning"

@@ -26,9 +26,21 @@
     "R03",
     "R04",
     "R05",
-    "R06"
+    "R06",
+    "C01",
+    "C02",
+    "C03",
+    "C04",
+    "C05",
+    "C06",
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06"
   ],
-  "mvp_basic_sprite_frames": 74,
+  "mvp_basic_sprite_frames": 122,
   "progress_source": "active_session_seconds",
   "ai_activity_experimental": {
     "provider": "claude_code_stop_hook",

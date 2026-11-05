@@ -1,3 +1,4 @@
+import {expansion} from './expansion.mjs';
 import {newSpecies} from './new-species.mjs';
 export const content = {
  D01:{ name:'모루잎', kind:'숲용', color:'sage', description:'씨앗처럼 둥근 얼굴, 접힌 잎귀와 짧은 덩굴 꼬리의 낮잠꾸러기.',  adult:'작은 잎날개가 넓게 자랐어요. 이제 정원 그늘에서 다른 친구들을 기다려요.' },
@@ -61,6 +62,6 @@ const dispositions={
 };
 for(const [id,name,kind,element,description,adult,like] of newSpecies){
  content[id]={name,kind,color:({불:'clay',물:'sky',풀:'sage'})[element],description,adult};
- profiles[id]={personality:dispositions[id],likes:[like],reaction:description,adaptation:adult,tradition:'모아몬의 오리지널 캐릭터예요.'};
+ profiles[id]={personality:dispositions[id]??expansion.find(row=>row[0]===id)?.[8],likes:[like],reaction:description,adaptation:adult,tradition:'모아몬의 오리지널 캐릭터예요.'};
  elements[id]=element;
 }

@@ -1,3 +1,4 @@
+import {expansion} from './expansion.mjs';
 export const newSpecies = [
   [
     "M01",
@@ -120,3 +121,5 @@ export const newSpecies = [
     "fox"
   ]
 ];
+
+newSpecies.push(...expansion.map(row=>row.slice(0,8)));

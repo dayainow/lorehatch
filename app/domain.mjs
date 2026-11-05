@@ -1,8 +1,8 @@
 import {newSpecies} from './new-species.mjs';
-export const habitatNames=['세샘숲','갈대늪','별빛고개'];
+export const habitatNames=['세샘숲','갈대늪','별빛고개','조개해변','꽃바람들판'];
 export const IDS = ['D01', 'G01', 'G02', 'D02', 'N01', 'E01', ...newSpecies.map(row=>row[0])];
 export const habitatOf=id=>Math.floor(IDS.indexOf(id)/6);
-export const openHabitat=s=>Math.min(2,Math.floor(s.pets.filter(p=>p.stage==='adult').length/6));
+export const openHabitat=s=>Math.min(habitatNames.length-1,Math.floor(s.pets.filter(p=>p.stage==='adult').length/6));
 export const MODES = Object.freeze({ normal: { hatch: 1500, growth: 4500, cap: 9000 }, demo: { hatch: 15, growth: 30, cap: 9000 } });
 export const SAVE_VERSION = 1;
 export function dayKey(date = new Date()) {
@@ -96,7 +96,7 @@ export function parseSave(text, expectedMode) {
   if (s.pets.some(p=>p.stage==='baby' && (p.id!==s.active?.id || !['raising','growth_ready'].includes(s.phase)))) fail();
   if (!s.tutorialClaimed && (s.phase !== 'idle' || s.pets.length || s.total || s.bank)) fail();
   // Reopen a completed original garden when the new egg becomes available.
-  if (s.phase==='complete' && [3,4,6].includes(s.pets.length) && IDS.slice(0,s.pets.length).every(id=>s.pets.some(p=>p.id===id && p.stage==='adult'))) s.phase='idle';
+  if (s.phase==='complete' && [3,4,6,18].includes(s.pets.length) && IDS.slice(0,s.pets.length).every(id=>s.pets.some(p=>p.id===id && p.stage==='adult'))) s.phase='idle';
   if (s.phase==='complete' && (s.pets.length!==IDS.length || s.pets.some(p=>p.stage!=='adult'))) fail();
   if (s.phase==='idle' && s.pets.length===IDS.length) fail();
   // Return only known fields; never retain arbitrary imported properties.

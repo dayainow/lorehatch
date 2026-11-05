@@ -47,19 +47,19 @@ No hunger meter. No lost streaks. No punishment for taking a day off.
 
 ## A garden worth getting to know
 
-- **18 species, 36 appearances.** Every friend has a baby and grown form, a personality, and something they love. Growth stages count as one species.
-- **Three connected habitats.** Raise the six residents of one habitat to unlock the next set of eggs. Preview the whole collection in the field guide.
-- **Nine little friendship stories.** Raise and care for both friends in a pair to discover their shared ending. Your next egg suggestions help you find the missing friend.
+- **30 species, 60 appearances.** Every friend has a baby and grown form, a personality, and something they love. Growth stages count as one species.
+- **Five connected habitats.** Raise the six residents of one habitat to unlock the next set of eggs. Preview the whole collection in the field guide.
+- **Fifteen little friendship stories.** Raise and care for both friends in a pair to discover their shared ending. Your next egg suggestions help you find the missing friend.
 - **Care with character.** Warm a leaf-wing in the sun, brush seeds from a rabbit’s ears, or leave a stepping stone by the water. Baby and grown friends respond differently.
 - **A companion on your Mac.** Keep your selected partner on screen, drag it to a comfortable spot, and open its care menu with a click.
 
-![All 18 current species, shown in their grown forms](docs/media/moamon-roster.svg)
+![All 30 current species, shown in their grown forms](docs/media/moamon-roster.svg)
 
-<p align="center"><sub>Current development roster. The long-term goal is 120 species; 18 are implemented today.</sub></p>
+<p align="center"><sub>Current development roster. The long-term goal is 120 species; 30 are implemented today.</sub></p>
 
 ## A collection beyond the creatures
 
-The current development build adds **18 choice-based encounters**, **18 memory cards**, and **10 collection milestones**. Meet a friend in the garden, choose a small way to help, and keep the moment in your memory journal. Owned friends remain available at any time; there are no missed-day penalties or duplicate card rewards.
+The current development build adds **30 choice-based encounters**, **30 memory cards**, and **12 collection milestones**. Meet a friend in the garden, choose a small way to help, and keep the moment in your memory journal. Owned friends remain available at any time; there are no missed-day penalties or duplicate card rewards.
 
 ## Small gestures. Shared stories.
 
@@ -171,10 +171,10 @@ Near-term priorities are broader Mac interaction testing, English game UI, and a
 
 ## Development snapshot · November 5, 2026
 
-The local v0.6.0 build includes the redesigned starters, all 18 species, the memory journal, desktop companion controls, and the experimental AI hook. These changes are not a public release announcement.
+The local v0.6.0 build includes the redesigned starters, all 30 species, the memory journal, desktop companion controls, and the experimental AI hook. The 30-species expansion is source-verified; a fresh Mac GUI pass is still needed. These changes are not a public release announcement.
 
-- **Verified:** 36 automated tests passed; the installed Mac app was checked for a complete memory encounter and journal recording, care persistence, and companion visibility and sizing.
-- **Still to validate:** live Claude Code integration, all 18 encounters in the GUI, and broader multi-monitor and long-running Mac behavior. Signing and notarization for public distribution remain unfinished.
+- **Verified:** 37 automated tests passed; the previous 18-species Mac build was checked for a complete memory encounter and journal recording, care persistence, and companion visibility and sizing.
+- **Still to validate:** live Claude Code integration, all 30 encounters in the GUI, and broader multi-monitor and long-running Mac behavior. Signing and notarization for public distribution remain unfinished.
 
 [Memory journal implementation notes (Korean)](docs/26-memory-journal.md) · [AI setup and limitations](docs/24-ai-activity.md).
 

@@ -1,3 +1,4 @@
+import {expansion} from './expansion.mjs';
 import {IDS,habitatOf} from './domain.mjs';
 import {pairs,friendship} from './fieldnotes.mjs';
 // Original, low-pressure encounters. No currency, timer or penalty for another try.
@@ -21,6 +22,10 @@ export const encounters={
  R05:['도톨의 굴 입구에 모래가 쌓였어요. 무엇을 할까요?',['입구 막기','모래를 평평하게 고르기','굴에 물 붓기'],1,'돌아오는 길','도톨이 고른 길을 따라 마른 잎을 굴로 가져갔어요.'],
  R06:['해솔이 쉬기 전에 꼬리를 정리해요. 어떻게 도울까요?',['꼬리 잡아당기기','찬 진흙 묻히기','꼬리 끝 빗어 주기'],2,'햇살 담요','해솔이 가지런한 꼬리를 둘러 작은 담요를 만들었어요.']
 };
+for(const [i,row] of expansion.entries()){
+ const choices=['큰 소리로 재촉하기','멀리 치워 두기'];const correct=i%3;choices.splice(correct,0,row[14]);
+ encounters[row[0]]=[row[13],choices,correct,row[15],row[16]];
+}
 export function rememberEncounter(state,id,choice){
  if(!state.pets.some(p=>p.id===id)||encounters[id]?.[2]!==choice||(state.memories??[]).includes(id))return state;
  return {...state,memories:[...(state.memories??[]),id]};
@@ -43,7 +48,9 @@ export function milestones(state){
  ['forest','숲의 식구','세샘숲 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===0).length,6,'06'],
  ['marsh','늪의 식구','갈대늪 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===1).length,6,'07'],
  ['ridge','고개의 식구','별빛고개 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===2).length,6,'08'],
- ['album','추억 한 권','열여덟 추억 카드 모으기',(state.memories??[]).length,18,'09'],
- ['together','함께 사는 정원','아홉 친구 이야기 완성하기',stories,9,'10']
+ ['shore','해변의 식구','조개해변 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===3).length,6,'11'],
+ ['meadow','들판의 식구','꽃바람들판 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===4).length,6,'12'],
+ ['album','추억 한 권','모든 친구의 추억 카드 모으기',(state.memories??[]).length,IDS.length,'09'],
+ ['together','함께 사는 정원','모든 친구 이야기 완성하기',stories,pairs.length,'10']
  ].map(([id,title,description,value,target,number])=>({id,title,description,value:Math.min(value,target),target,number,complete:value>=target}));
 }

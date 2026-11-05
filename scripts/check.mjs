@@ -22,4 +22,10 @@ for(const c of plan.species){
  for(const key of ['egg_pattern','silhouette','baby','adult','personality_ko','idle_motion_ko','pet_reaction_ko','growth_line_ko','research_gate_ko','art_gate_ko'])if(typeof c[key]!=='string'||!c[key].trim())throw Error(`Missing design field: ${c.id}/${key}`);
 }
 for(const id of IDS)for(const stage of ['baby','adult'])for(let frame=0;frame<2;frame++)await readFile(`assets/sprites/${id}-${stage}-${frame}.svg`);
-console.log('PASS: 18 playable + 4 named candidates toward 120 species, release waves and source links');
+console.log('PASS: 30 playable + 4 named candidates toward 120 species, release waves and source links');
+
+if(balance.mvp_basic_sprite_frames!==IDS.length*4+2)throw Error('Sprite frame count drift');
+const {fieldnotes,pairs,habitatLore}=await import('../app/fieldnotes.mjs');
+const {habitatNames}=await import('../app/domain.mjs');
+if(!sameSet(Object.keys(fieldnotes),IDS)||!sameSet(pairs.flatMap(p=>p.slice(0,2)),IDS)||habitatLore.length!==habitatNames.length)throw Error('Care, relationship or habitat drift');
+for(const id of IDS)if(!profiles[id].personality)throw Error(`Missing personality: ${id}`);

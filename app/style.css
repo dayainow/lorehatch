@@ -138,3 +138,5 @@ dialog::backdrop{background:#102e2866;backdrop-filter:blur(5px)}
 @media(max-width:760px){.visitor-section{padding:20px;grid-template-columns:90px 1fr;gap:14px}.visitor-character .sprite{width:88px;height:88px}.next-stamp{grid-column:1/-1;border-left:0;border-top:1px solid #ccd4bd;padding:15px 0}.stamp-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.memory-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.memory-card{padding:16px 8px}.memory-card .sprite{width:90px;height:90px}.header nav{gap:12px}.nav-button{font-size:12px}}
 @media(max-width:400px){.brand small{display:none}.brand{font-size:17px}.brand-mark{display:none}.header nav{gap:9px}.header{padding:0 12px}}
 @media(prefers-reduced-motion:reduce){.memory-card:hover{transform:none}}.reduce-motion .memory-card:hover{transform:none}
+.scene[data-region="3"]{background-color:#518c99;background-blend-mode:soft-light}
+.scene[data-region="4"]{background-color:#70874b;background-blend-mode:soft-light}

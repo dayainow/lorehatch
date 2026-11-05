@@ -1,15 +1,17 @@
 {
   "name": "lorehatch",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
-  "description": "Local-first pixel companion prototype",
+  "description": "Installable local-first pixel companion garden",
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "start": "node scripts/serve.mjs",
     "test": "node --test tests/*.test.mjs",
     "check": "node scripts/check.mjs",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "package:mac": "node scripts/package-macos.mjs",
+    "package:web": "node scripts/package-web.mjs"
   },
   "engines": {
     "node": ">=22"

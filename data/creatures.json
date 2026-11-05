@@ -41,7 +41,7 @@
       "display_name_ko": "불꽃용",
       "source_ids": [],
       "research_status": "original_creation",
-      "scope": "collection",
+      "scope": "mvp",
       "fictional_adaptation": {
         "birth": "egg",
         "visual_direction": "불씨꼬리·짧은 뿔",
@@ -50,7 +50,7 @@
           "companion"
         ]
       },
-      "art_status": "not_created"
+      "art_status": "code_authored_svg_prototype"
     },
     {
       "id": "G01",
@@ -76,25 +76,30 @@
     },
     {
       "id": "G02",
-      "collection": "greek",
-      "origin": "greek",
-      "motif": "cerberus",
-      "display_name_ko": "케르베로스",
-      "source_ids": [
-        "S09"
-      ],
-      "research_status": "initial_source_review",
+      "collection": "original",
+      "origin": "original",
+      "motif": "ember_puppy",
+      "display_name_ko": "불씨 강아지",
+      "source_ids": [],
+      "research_status": "original_fiction",
       "scope": "mvp",
       "fictional_adaptation": {
         "birth": "egg",
-        "visual_direction": "한 몸·세 머리·네 다리",
+        "visual_direction": "한 얼굴·숯빛 귀·작은 불씨 꼬리·성장 후 불꽃 목털",
         "growth_stages": [
           "young",
           "companion"
         ]
       },
       "art_status": "code_authored_svg_prototype",
-      "short_description_ko": "세 머리 강아지"
+      "short_description_ko": "숯빛 귀와 불씨 꼬리를 가진 강아지",
+      "previous_design": {
+        "motif": "cerberus",
+        "source_ids": [
+          "S09"
+        ],
+        "note": "Retired three-headed design; source IDs retained as historical references only."
+      }
     },
     {
       "id": "A01",
@@ -146,7 +151,7 @@
         "S01"
       ],
       "research_status": "initial_source_review",
-      "scope": "collection",
+      "scope": "mvp",
       "fictional_adaptation": {
         "birth": "egg",
         "visual_direction": "큰 꼬리·씨앗 주머니",
@@ -155,7 +160,7 @@
           "companion"
         ]
       },
-      "art_status": "not_created"
+      "art_status": "code_authored_svg_prototype"
     },
     {
       "id": "N02",
@@ -189,7 +194,7 @@
         "S03"
       ],
       "research_status": "initial_source_review",
-      "scope": "collection",
+      "scope": "mvp",
       "fictional_adaptation": {
         "birth": "egg",
         "visual_direction": "긴 목·두 갈래 머리깃",
@@ -198,7 +203,7 @@
           "companion"
         ]
       },
-      "art_status": "not_created"
+      "art_status": "code_authored_svg_prototype"
     },
     {
       "id": "E02",
@@ -265,6 +270,138 @@
       "scope": "deferred",
       "collection": "egyptian",
       "origin": "egyptian"
+    },
+    {
+      "id": "M01",
+      "display_name_ko": "갈대토끼",
+      "origin": "original",
+      "motif": "rabbit",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "긴 귀 사이에 갈대씨가 붙었어요."
+      }
+    },
+    {
+      "id": "M02",
+      "display_name_ko": "물방울개구리",
+      "origin": "original",
+      "motif": "frog",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "목 아래에 작은 물방울을 품고 있어요."
+      }
+    },
+    {
+      "id": "M03",
+      "display_name_ko": "등불나방",
+      "origin": "original",
+      "motif": "moth",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "접은 날개 아래로 불빛이 새어 나와요."
+      }
+    },
+    {
+      "id": "M04",
+      "display_name_ko": "연잎거북",
+      "origin": "original",
+      "motif": "turtle",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "작은 연잎 하나를 등에 얹었어요."
+      }
+    },
+    {
+      "id": "M05",
+      "display_name_ko": "구름달팽이",
+      "origin": "original",
+      "motif": "snail",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "등의 작은 구름이 빗물을 머금어요."
+      }
+    },
+    {
+      "id": "M06",
+      "display_name_ko": "숯불도롱뇽",
+      "origin": "original",
+      "motif": "newt",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "납작한 배로 데운 돌을 꼭 안아요."
+      }
+    },
+    {
+      "id": "R01",
+      "display_name_ko": "솔방울고슴도치",
+      "origin": "original",
+      "motif": "hedgehog",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "솔방울 조각을 가시 사이에 끼웠어요."
+      }
+    },
+    {
+      "id": "R02",
+      "display_name_ko": "서리올빼미",
+      "origin": "original",
+      "motif": "owl",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "둥근 눈썹에 서리가 앉았어요."
+      }
+    },
+    {
+      "id": "R03",
+      "display_name_ko": "샘물가오리",
+      "origin": "original",
+      "motif": "ray",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "작은 지느러미로 샘 위를 떠다녀요."
+      }
+    },
+    {
+      "id": "R04",
+      "display_name_ko": "새싹사슴",
+      "origin": "original",
+      "motif": "deer",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "이마에 새싹 같은 뿔이 돋았어요."
+      }
+    },
+    {
+      "id": "R05",
+      "display_name_ko": "화산두더지",
+      "origin": "original",
+      "motif": "mole",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "뜨거운 모래에서 코만 내밀어요."
+      }
+    },
+    {
+      "id": "R06",
+      "display_name_ko": "햇살여우",
+      "origin": "original",
+      "motif": "fox",
+      "scope": "mvp",
+      "source_ids": [],
+      "fictional_adaptation": {
+        "visual_direction": "해가 지면 꼬리를 담요처럼 둘러요."
+      }
     }
   ],
   "content_version": "0.6-planning"

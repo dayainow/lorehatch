@@ -1,0 +1,5 @@
+{
+ "id":"./", "name":"모아몬: 책상 위 알 키우기", "short_name":"모아몬", "lang":"ko", "description":"알을 부화시키고 작은 도트 펫을 키우는 로컬 정원",
+ "start_url":"./", "scope":"./", "display":"standalone", "background_color":"#f4f1e8", "theme_color":"#f4f1e8",
+ "icons":[{"src":"./assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"./assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"./assets/icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]
+}

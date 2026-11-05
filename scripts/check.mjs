@@ -22,4 +22,4 @@ for(const c of plan.species){
  for(const key of ['egg_pattern','silhouette','baby','adult','personality_ko','idle_motion_ko','pet_reaction_ko','growth_line_ko','research_gate_ko','art_gate_ko'])if(typeof c[key]!=='string'||!c[key].trim())throw Error(`Missing design field: ${c.id}/${key}`);
 }
 for(const id of IDS)for(const stage of ['baby','adult'])for(let frame=0;frame<2;frame++)await readFile(`assets/sprites/${id}-${stage}-${frame}.svg`);
-console.log('PASS: 3 playable + 7 planned species, release waves and source links');
+console.log('PASS: 18 playable + 4 named candidates toward 120 species, release waves and source links');

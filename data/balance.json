@@ -11,8 +11,30 @@
   "mvp_species_ids": [
     "D01",
     "G01",
-    "G02"
+    "G02",
+    "D02",
+    "N01",
+    "E01",
+    "M01",
+    "M02",
+    "M03",
+    "M04",
+    "M05",
+    "M06",
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R05",
+    "R06"
   ],
-  "mvp_basic_sprite_frames": 14,
-  "progress_source": "active_session_seconds"
+  "mvp_basic_sprite_frames": 74,
+  "progress_source": "active_session_seconds",
+  "ai_activity_experimental": {
+    "provider": "claude_code_stop_hook",
+    "seconds_per_active_minute": 60,
+    "max_event_age_seconds": 60,
+    "manual_session_overlap": "skip",
+    "historical_credit": false
+  }
 }

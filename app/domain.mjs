@@ -1,4 +1,8 @@
-export const IDS = ['D01', 'G01', 'G02'];
+import {newSpecies} from './new-species.mjs';
+export const habitatNames=['세샘숲','갈대늪','별빛고개'];
+export const IDS = ['D01', 'G01', 'G02', 'D02', 'N01', 'E01', ...newSpecies.map(row=>row[0])];
+export const habitatOf=id=>Math.floor(IDS.indexOf(id)/6);
+export const openHabitat=s=>Math.min(2,Math.floor(s.pets.filter(p=>p.stage==='adult').length/6));
 export const MODES = Object.freeze({ normal: { hatch: 1500, growth: 4500, cap: 9000 }, demo: { hatch: 15, growth: 30, cap: 9000 } });
 export const SAVE_VERSION = 1;
 export function dayKey(date = new Date()) {
@@ -17,7 +21,7 @@ function applyBank(s) {
   return s;
 }
 export function selectEgg(state, id) {
-  if (!IDS.includes(id) || !['idle','complete'].includes(state.phase) || state.pets.some(p => p.id === id)) return state;
+  if (!IDS.includes(id) || habitatOf(id)>openHabitat(state) || !['idle','complete'].includes(state.phase) || state.pets.some(p => p.id === id)) return state;
   const s = structuredClone(state);
   s.active = { id, progress: 0 };
   s.phase = s.tutorialClaimed ? 'incubating' : 'hatch_ready';
@@ -49,6 +53,11 @@ export function earn(state, seconds, day = dayKey()) {
   s.bank = Math.min(s.bank, 3 * (MODES[s.mode].hatch + MODES[s.mode].growth));
   return applyBank(s);
 }
+export function recordCare(state,id){
+  const pet=state.pets.find(p=>p.id===id);
+  if(!pet||pet.care?.includes(pet.stage))return state;
+  return {...state,pets:state.pets.map(p=>p.id===id?{...p,care:[...(p.care??[]),p.stage]}:p)};
+}
 export function setPartner(state, id) {
   if (!state.pets.some(p => p.id === id)) return state;
   return { ...state, partner: id };
@@ -64,10 +73,13 @@ export function parseSave(text, expectedMode) {
   let s; try { s = JSON.parse(text); } catch { throw new Error('JSON 저장 파일을 읽을 수 없습니다.'); }
   const fail = () => { throw new Error('지원하지 않거나 손상된 저장 파일입니다.'); };
   if (!s || s.schemaVersion !== SAVE_VERSION || !Object.hasOwn(MODES,s.mode) || (expectedMode && s.mode !== expectedMode)) fail();
+  if(s.memories!==undefined&&(!Array.isArray(s.memories)||s.memories.length>IDS.length||new Set(s.memories).size!==s.memories.length||s.memories.some(id=>!s.pets.some(p=>p.id===id))))fail();
   const cfg = MODES[s.mode];
+  if(s.activity!==undefined&&(!s.activity||typeof s.activity.enabled!=='boolean'||!Number.isSafeInteger(s.activity.lastBucket)||s.activity.lastBucket<0||!Number.isSafeInteger(s.activity.since)||s.activity.since<0))fail();
   if (!['idle','incubating','hatch_ready','raising','growth_ready','complete'].includes(s.phase)) fail();
-  if (!Array.isArray(s.pets) || s.pets.length > 3 || new Set(s.pets.map(p=>p?.id)).size !== s.pets.length) fail();
+  if (!Array.isArray(s.pets) || s.pets.length > IDS.length || new Set(s.pets.map(p=>p?.id)).size !== s.pets.length) fail();
   for (const p of s.pets) if (!p || !IDS.includes(p.id) || !['baby','adult'].includes(p.stage) || typeof p.nickname !== 'string' || p.nickname.length > 20 || !validDate(p.hatchedAt) || (p.stage === 'adult' ? !validDate(p.grownAt) : p.grownAt !== null)) fail();
+  for(const p of s.pets)if(p.care!==undefined&&(!Array.isArray(p.care)||p.care.length>2||new Set(p.care).size!==p.care.length||p.care.some(stage=>stage!=='baby'&&(stage!=='adult'||p.stage!=='adult'))))fail();
   if (s.partner !== null && !s.pets.some(p=>p.id===s.partner)) fail();
   if (s.pets.length && s.partner === null) fail();
   if (!number(s.bank,3*(cfg.hatch+cfg.growth)) || !number(s.daily,cfg.cap) || !number(s.total,Number.MAX_SAFE_INTEGER) || s.daily > s.total) fail();
@@ -83,11 +95,25 @@ export function parseSave(text, expectedMode) {
   } else if (s.active !== null) fail();
   if (s.pets.some(p=>p.stage==='baby' && (p.id!==s.active?.id || !['raising','growth_ready'].includes(s.phase)))) fail();
   if (!s.tutorialClaimed && (s.phase !== 'idle' || s.pets.length || s.total || s.bank)) fail();
-  if (s.phase==='complete' && (s.pets.length!==3 || s.pets.some(p=>p.stage!=='adult'))) fail();
-  if (s.phase==='idle' && s.pets.length===3) fail();
+  // Reopen a completed original garden when the new egg becomes available.
+  if (s.phase==='complete' && [3,4,6].includes(s.pets.length) && IDS.slice(0,s.pets.length).every(id=>s.pets.some(p=>p.id===id && p.stage==='adult'))) s.phase='idle';
+  if (s.phase==='complete' && (s.pets.length!==IDS.length || s.pets.some(p=>p.stage!=='adult'))) fail();
+  if (s.phase==='idle' && s.pets.length===IDS.length) fail();
   // Return only known fields; never retain arbitrary imported properties.
   return { schemaVersion: SAVE_VERSION, mode:s.mode, phase:s.phase, active:s.active ? { id:s.active.id, progress:s.active.progress }:null,
-    pets:s.pets.map(p=>({id:p.id,stage:p.stage,nickname:p.nickname,hatchedAt:p.hatchedAt,grownAt:p.grownAt})), partner:s.partner,
+    pets:s.pets.map(p=>({id:p.id,stage:p.stage,nickname:p.nickname,hatchedAt:p.hatchedAt,grownAt:p.grownAt,...(p.care?{care:[...p.care]}:{})})), partner:s.partner,
     bank:s.bank, day:s.day, daily:s.daily, total:s.total, tutorialClaimed:s.tutorialClaimed,
+    ...(s.activity?{activity:{enabled:s.activity.enabled,lastBucket:s.activity.lastBucket,since:s.activity.since}}:{}),
+    ...(s.memories?{memories:[...s.memories]}:{}),
     settings:{ reducedMotion:s.settings.reducedMotion, decoration:s.settings.decoration } };
+}
+
+// Split short active ticks at local midnight; neither side can reopen a past bucket.
+export function earnInterval(state, seconds, wallStart) {
+  if(!Number.isFinite(wallStart)||!Number.isFinite(seconds)||seconds<=0||seconds>5)return state;
+  const start=new Date(wallStart),end=new Date(wallStart+seconds*1000);
+  if(dayKey(start)===dayKey(end))return earn(state,seconds,dayKey(start));
+  const boundary=new Date(start.getFullYear(),start.getMonth(),start.getDate()+1).getTime();
+  const before=Math.max(0,Math.min(seconds,(boundary-wallStart)/1000));
+  return earn(earn(state,before,dayKey(start)),seconds-before,dayKey(end));
 }

@@ -22,7 +22,7 @@ test('memory saves roundtrip and reject unowned, duplicated, and malformed memor
 });
 test('visitors are stable owned friends and milestones are bounded',()=>{
  const s=start();assert.equal(visitorFor(s,'2026-11-05'),'D01');assert.equal(visitorFor(initialState(),'2026-11-05'),null);
- const marks=milestones(s);assert.equal(marks.filter(m=>m.complete).length,1);
+ const marks=milestones(s);assert.deepEqual(marks.map(m=>m.number),Array.from({length:14},(_,i)=>String(i+1).padStart(2,'0')));assert.equal(marks.filter(m=>m.complete).length,1);
  assert.ok(marks.every(m=>m.value>=0&&m.value<=m.target));
  const full={pets:IDS.map(id=>({id,stage:'adult',care:['adult']})),memories:[...IDS]};
  assert.equal(milestones(full).filter(m=>m.complete).length,14);

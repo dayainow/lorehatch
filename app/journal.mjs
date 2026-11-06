@@ -48,10 +48,10 @@ export function milestones(state){
  ['forest','숲의 식구','세샘숲 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===0).length,6,'06'],
  ['marsh','늪의 식구','갈대늪 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===1).length,6,'07'],
  ['ridge','고개의 식구','별빛고개 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===2).length,6,'08'],
- ['shore','해변의 식구','조개해변 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===3).length,6,'11'],
- ['meadow','들판의 식구','꽃바람들판 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===4).length,6,'12'],
  ['album','추억 한 권','추억 카드 열여덟 장 모으기',(state.memories??[]).length,18,'09'],
  ['together','함께 사는 정원','친구 이야기 아홉 편 완성하기',stories,9,'10'],
+ ['shore','해변의 식구','조개해변 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===3).length,6,'11'],
+ ['meadow','들판의 식구','꽃바람들판 여섯 친구 성장시키기',adults.filter(p=>habitatOf(p.id)===4).length,6,'12'],
  ['album30','두 번째 추억 수첩','추억 카드 서른 장 모으기',(state.memories??[]).length,30,'13'],
  ['together15','다섯 마을의 친구들','친구 이야기 열다섯 편 완성하기',stories,15,'14']
  ].map(([id,title,description,value,target,number])=>({id,title,description,value:Math.min(value,target),target,number,complete:value>=target}));

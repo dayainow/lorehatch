@@ -120,12 +120,12 @@ The app is written to `build/desktop/Lorehatch.app`, with a universal ZIP in `re
 ## Your first few minutes
 
 1. **Pick your first friend.** Choose a fire, water, or grass egg and confirm its instant hatch.
-2. **Start a focus session.** Choose 10, 25, or 50 minutes—or an open-ended session.
+2. **Start a focus session.** Choose 5, 15, or 30 minutes—or an open-ended session.
 3. **Visit the field guide.** Open your friend and try its care action. Come back after growth for a different reaction.
 4. **Keep a memory.** Open the memory journal, meet an owned friend, and choose how to help. A wrong choice costs nothing; try again.
 5. **Find its friend.** Check the relationship hint and choose the next egg when it becomes available.
 
-The normal garden uses 25 minutes to hatch later eggs and 75 minutes to grow a baby, with up to 150 minutes credited per day. The fast demo uses 15 seconds to hatch and 30 seconds to grow. These values are still being playtested.
+The normal garden uses 5 minutes to hatch later eggs and 15 minutes to grow a baby, with up to 150 minutes credited per day. The fast demo uses 15 seconds to hatch and 30 seconds to grow. These values are still being playtested.
 
 **Manual focus time accrues while the garden view is visible and a session is running.** Hiding the garden, switching away from the browser tab, or locking the screen pauses progress. A floating desktop pet does not mean background focus time is being counted.
 
@@ -133,7 +133,7 @@ The normal garden uses 25 minutes to hatch later eggs and 75 minutes to grow a b
 <summary><strong>Quick guide to the Korean buttons</strong></summary>
 
 - **첫 알 고르기** — Choose your first egg
-- **집중 시작** — Start focusing
+- **같이 작업하기** — Start focusing
 - **성장한 모습 보기** — Reveal the grown form
 - **도감** — Field guide
 - **내 펫** — My pets
@@ -173,7 +173,7 @@ Near-term priorities are broader Mac interaction testing, English game UI, and a
 
 The local v0.6.0 build includes the redesigned starters, all 30 species, the memory journal, desktop companion controls, and the experimental AI hook. The 30-species expansion has passed automated checks and a Mac GUI pass for new habitat listings, element filtering, locked details, and journal totals. Full new-species playthroughs are still needed. These changes are not a public release announcement.
 
-- **Verified:** 40 automated tests passed; the previous 18-species Mac build was checked for a complete memory encounter and journal recording, care persistence, and companion visibility and sizing.
+- **Verified:** 41 automated tests passed; the previous 18-species Mac build was checked for a complete memory encounter and journal recording, care persistence, and companion visibility and sizing.
 - **Still to validate:** live Claude Code integration, all 30 encounters in the GUI, and broader multi-monitor and long-running Mac behavior. Signing and notarization for public distribution remain unfinished.
 
 [Memory journal implementation notes (Korean)](docs/26-memory-journal.md) · [AI setup and limitations](docs/24-ai-activity.md).

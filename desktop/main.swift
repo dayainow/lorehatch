@@ -185,7 +185,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     @objc func showWindow(){window.makeKeyAndOrderFront(nil);NSApp.activate(ignoringOtherApps:true)}
     @objc func toggleFloating(_ sender:NSMenuItem){let enabled=window.level != .floating;window.level=enabled ? .floating : .normal;sender.state=enabled ? .on : .off}
     @objc func showData(){NSWorkspace.shared.open(store.folder)}
-    @objc func showAbout(){let alert=NSAlert();alert.messageText="모아몬 0.6.0";alert.informativeText="로컬 저장으로 키우는 작은 도트 펫 정원\n앱 창이 보일 때 집중 시간을 반영해요.\n메뉴바에서 다시 열거나 항상 위에 둘 수 있어요.";alert.runModal()}
+    @objc func showAbout(){let alert=NSAlert();alert.messageText="모아몬 0.6.0";alert.informativeText="로컬 저장으로 키우는 작은 도트 펫 정원\n앱 창이 보일 때 함께한 시간을 반영해요.\n메뉴바에서 다시 열거나 항상 위에 둘 수 있어요.";alert.runModal()}
     func windowShouldClose(_ sender: NSWindow)->Bool { web.evaluateJavaScript("window.dispatchEvent(new Event('lorehatch-suspend'))");sender.orderOut(nil);return false }
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows:Bool)->Bool{showWindow();return true}
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply {

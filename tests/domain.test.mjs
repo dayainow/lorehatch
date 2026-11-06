@@ -11,7 +11,7 @@ test('all thirty species complete without duplicate awards',()=>{let s=start();s
 test('overflow survives completion and is applied to next egg',()=>{let s=advance(start(),35);assert.equal(s.phase,'growth_ready');assert.equal(s.bank,5);s=selectEgg(confirmReady(s),'G01');assert.equal(s.active.progress,5);assert.equal(s.bank,0);});
 test('daily cap holds and past date cannot reset it',()=>{let s=advance(start(),9100);assert.equal(s.daily,9000);s=earn(s,5,'2026-10-28');assert.equal(s.daily,9000);s=earn(s,5,'2026-10-30');assert.equal(s.daily,5);assert.equal(s.total,9005);});
 test('sleep gaps, negative values and nonfinite deltas are ignored',()=>{const s=start();for(const delta of [6,3600,-1,NaN,Infinity])assert.strictEqual(earn(s,delta),s);});
-test('normal balance and demo saves remain separate',()=>{assert.equal(MODES.normal.growth,4500);assert.throws(()=>parseSave(JSON.stringify(start()),'normal'));const m=memory();persist(m,start());assert.equal(load(m,'normal').state.pets.length,0);assert.equal(load(m,'demo').state.pets.length,1);});
+test('normal balance and demo saves remain separate',()=>{assert.equal(MODES.normal.growth,900);assert.throws(()=>parseSave(JSON.stringify(start()),'normal'));const m=memory();persist(m,start());assert.equal(load(m,'normal').state.pets.length,0);assert.equal(load(m,'demo').state.pets.length,1);});
 test('partner selection does not change raising target',()=>{let s=confirmReady(advance(start(),30));s=confirmReady(advance(selectEgg(s,'G01'),15));s=setPartner(s,'D01');assert.equal(s.active.id,'G01');assert.equal(s.partner,'D01');assert.strictEqual(setPartner(s,'invalid'),s);});
 test('nickname trims and limits length',()=>{const s=renamePet(start(),'D01','  '+ '가'.repeat(30)+'  ');assert.equal(s.pets[0].nickname.length,20);});
 test('invalid import fails without touching original state',()=>{const s=start();for(const mutate of [x=>x.pets.push(x.pets[0]),x=>x.active.id='bad',x=>x.bank=-1,x=>x.phase='complete',x=>x.day='2026-02-31',x=>x.settings=null,x=>x.partner='G02',x=>x.pets[0].stage='adult',x=>x.schemaVersion=999]){const copy=structuredClone(s);mutate(copy);assert.throws(()=>parseSave(JSON.stringify(copy)));}assert.equal(s.pets.length,1);assert.throws(()=>parseSave('x'.repeat(100001)));assert.throws(()=>parseSave('{'));});
@@ -20,7 +20,7 @@ test('save roundtrip and recovery from corrupted primary',()=>{const m=memory();
 test('corrupt primary without backup is preserved and blocks overwrite',()=>{const m=memory();m.setItem(keyFor('demo'),'bad');assert.equal(load(m,'demo').blocked,true);assert.equal(m.getItem(keyFor('demo')),'bad');});
 test('storage unavailable reports a blocked session',()=>{assert.equal(load({getItem(){throw Error('denied')}},'demo').blocked,true);});
 test('transitions do not mutate their input',()=>{const s=start(),snapshot=JSON.stringify(s);advance(s,40);renamePet(s,'D01','test');assert.equal(JSON.stringify(s),snapshot);});
-test('every transition survives save validation over full normal run',()=>{let s=initialState('normal',date);let day=date;for(const id of IDS){s=selectEgg(s,id);for(let i=0;i<3000;i++){s=parseSave(JSON.stringify(s));if(s.phase.endsWith('ready'))s=confirmReady(s);if(s.phase==='idle'||s.phase==='complete')break;if(s.daily===9000)day=new Date(Date.parse(day)+86400000).toISOString().slice(0,10);s=earn(s,5,day);}}assert.equal(s.phase,'complete');assert.equal(s.total,4500+(IDS.length-1)*6000);});
+test('every transition survives save validation over full normal run',()=>{let s=initialState('normal',date);let day=date;for(const id of IDS){s=selectEgg(s,id);for(let i=0;i<3000;i++){s=parseSave(JSON.stringify(s));if(s.phase.endsWith('ready'))s=confirmReady(s);if(s.phase==='idle'||s.phase==='complete')break;if(s.daily===9000)day=new Date(Date.parse(day)+86400000).toISOString().slice(0,10);s=earn(s,5,day);}}assert.equal(s.phase,'complete');assert.equal(s.total,900+(IDS.length-1)*1200);});
 test('missing or empty primary recovers the last valid backup',()=>{
  for(const primary of [null,'']){
   const m=memory(),s=start(),key=keyFor('demo');
@@ -119,4 +119,18 @@ test('completed 18-species saves reopen at the shore without losing care or memo
  assert.deepEqual(restored.memories,['D01']);assert.deepEqual(restored.pets[0].care,['baby','adult']);
  assert.equal(selectEgg(restored,'C01').phase,'incubating');
  assert.strictEqual(selectEgg(restored,'F01'),restored);
+});
+
+test('old normal saves keep earned time when moving to faster growth',()=>{
+ let s=confirmReady(selectEgg(initialState('normal',date),'D01'));
+ delete s.balanceVersion;s.active.progress=1200;s.total=1200;s.daily=1200;
+ const next=parseSave(JSON.stringify(s));
+ assert.equal(next.phase,'growth_ready');assert.equal(next.active.progress,900);assert.equal(next.bank,300);
+ assert.equal(next.total,1200);assert.equal(next.balanceVersion,1);
+ assert.deepEqual(parseSave(JSON.stringify(next)),next);
+ s.active.progress=80;s.total=80;s.daily=80;
+ assert.equal(parseSave(JSON.stringify(s)).active.progress,80);
+ s.phase='growth_ready';s.active.progress=4500;s.total=4500;s.daily=4500;
+ const ready=parseSave(JSON.stringify(s));assert.equal(ready.bank,3600);assert.equal(ready.active.progress,900);
+ s.active.progress=4501;assert.throws(()=>parseSave(JSON.stringify(s)));
 });

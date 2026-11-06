@@ -1,8 +1,8 @@
 {
   "status": "untested_design_proposal",
   "version": "0.3",
-  "incubation_minutes": 25,
-  "growth_minutes": 75,
+  "incubation_minutes": 5,
+  "growth_minutes": 15,
   "daily_earning_cap_minutes": 150,
   "tutorial_instant_first_hatch": true,
   "offline_earning": false,

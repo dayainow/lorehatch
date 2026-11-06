@@ -11,9 +11,9 @@ await mkdir(folder,{recursive:true});
 let s=initialState('normal');
 function advance(seconds){for(let i=0;i<seconds;i+=5){if(s.daily===9000){const d=new Date(s.day+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);s.day=d.toISOString().slice(0,10);s.daily=0;}s=earn(s,Math.min(5,seconds-i),s.day);}}
 for(const id of IDS.slice(0,index)){
- s=selectEgg(s,id);if(s.phase==='incubating')advance(1500);s=confirmReady(s);advance(4500);s=confirmReady(s);
+ s=selectEgg(s,id);if(s.phase==='incubating')advance(300);s=confirmReady(s);advance(900);s=confirmReady(s);
 }
-s=selectEgg(s,id);advance(1500);s.bank=4500;
+s=selectEgg(s,id);advance(300);s.bank=900;
 s=parseSave(JSON.stringify(s));
 await writeFile(folder+'/saves.json',JSON.stringify({'lorehatch.v1.normal':JSON.stringify(s)}));
 await cp('build/desktop/Lorehatch.app',app,{recursive:true});

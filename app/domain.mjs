@@ -3,14 +3,14 @@ export const habitatNames=['세샘숲','갈대늪','별빛고개','조개해변'
 export const IDS = ['D01', 'G01', 'G02', 'D02', 'N01', 'E01', ...newSpecies.map(row=>row[0])];
 export const habitatOf=id=>Math.floor(IDS.indexOf(id)/6);
 export const openHabitat=s=>Math.min(habitatNames.length-1,Math.floor(s.pets.filter(p=>p.stage==='adult').length/6));
-export const MODES = Object.freeze({ normal: { hatch: 1500, growth: 4500, cap: 9000 }, demo: { hatch: 15, growth: 30, cap: 9000 } });
+export const MODES = Object.freeze({ normal: { hatch: 300, growth: 900, cap: 9000 }, demo: { hatch: 15, growth: 30, cap: 9000 } });
 export const SAVE_VERSION = 1;
 export function dayKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
 export function initialState(mode = 'normal', day = dayKey()) {
   if (!MODES[mode]) throw new Error('잘못된 모드입니다.');
-  return { schemaVersion: SAVE_VERSION, mode, phase: 'idle', active: null, pets: [], partner: null, bank: 0, day, daily: 0, total: 0, tutorialClaimed: false, settings: { reducedMotion: false, decoration: 'flowers' } };
+  return { schemaVersion: SAVE_VERSION, balanceVersion: 1, mode, phase: 'idle', active: null, pets: [], partner: null, bank: 0, day, daily: 0, total: 0, tutorialClaimed: false, settings: { reducedMotion: false, decoration: 'flowers' } };
 }
 export function targetSeconds(s) { return ['incubating','hatch_ready'].includes(s.phase) ? MODES[s.mode].hatch : MODES[s.mode].growth; }
 function applyBank(s) {
@@ -50,7 +50,7 @@ export function earn(state, seconds, day = dayKey()) {
   const credit = Math.max(0, Math.min(seconds, MODES[s.mode].cap - s.daily));
   s.daily += credit; s.total += credit; s.bank += credit;
   // The bank never grows beyond the remaining content budget.
-  s.bank = Math.min(s.bank, 3 * (MODES[s.mode].hatch + MODES[s.mode].growth));
+  s.bank = Math.min(s.bank, (s.mode==='normal'?18000:135));
   return applyBank(s);
 }
 export function recordCare(state,id){
@@ -73,7 +73,10 @@ export function parseSave(text, expectedMode) {
   let s; try { s = JSON.parse(text); } catch { throw new Error('JSON 저장 파일을 읽을 수 없습니다.'); }
   const fail = () => { throw new Error('지원하지 않거나 손상된 저장 파일입니다.'); };
   if (!s || s.schemaVersion !== SAVE_VERSION || !Object.hasOwn(MODES,s.mode) || (expectedMode && s.mode !== expectedMode)) fail();
-  const cfg = MODES[s.mode];
+  if(s.balanceVersion!==undefined&&s.balanceVersion!==1)fail();
+  const legacy=s.mode==='normal'&&s.balanceVersion===undefined;
+  const cfg = legacy?{hatch:1500,growth:4500,cap:9000}:MODES[s.mode];
+  const validationTarget=['incubating','hatch_ready'].includes(s.phase)?cfg.hatch:cfg.growth;
   if(s.activity!==undefined&&(!s.activity||typeof s.activity.enabled!=='boolean'||!Number.isSafeInteger(s.activity.lastBucket)||s.activity.lastBucket<0||!Number.isSafeInteger(s.activity.since)||s.activity.since<0))fail();
   if (!['idle','incubating','hatch_ready','raising','growth_ready','complete'].includes(s.phase)) fail();
   if (!Array.isArray(s.pets) || s.pets.length > IDS.length || new Set(s.pets.map(p=>p?.id)).size !== s.pets.length) fail();
@@ -82,14 +85,14 @@ export function parseSave(text, expectedMode) {
   for(const p of s.pets)if(p.care!==undefined&&(!Array.isArray(p.care)||p.care.length>2||new Set(p.care).size!==p.care.length||p.care.some(stage=>stage!=='baby'&&(stage!=='adult'||p.stage!=='adult'))))fail();
   if (s.partner !== null && !s.pets.some(p=>p.id===s.partner)) fail();
   if (s.pets.length && s.partner === null) fail();
-  if (!number(s.bank,3*(cfg.hatch+cfg.growth)) || !number(s.daily,cfg.cap) || !number(s.total,Number.MAX_SAFE_INTEGER) || s.daily > s.total) fail();
+  if (!number(s.bank,s.mode==='normal'?18000:135) || !number(s.daily,cfg.cap) || !number(s.total,Number.MAX_SAFE_INTEGER) || s.daily > s.total) fail();
   if (typeof s.day !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s.day) || !validDate(`${s.day}T12:00:00Z`) || new Date(`${s.day}T12:00:00Z`).toISOString().slice(0,10)!==s.day || typeof s.tutorialClaimed !== 'boolean') fail();
   if (!s.settings || typeof s.settings.reducedMotion !== 'boolean' || !['flowers','mushrooms','stones'].includes(s.settings.decoration)) fail();
   const activePhase = ['incubating','hatch_ready','raising','growth_ready'].includes(s.phase);
   if (activePhase) {
-    if (!s.active || !IDS.includes(s.active.id) || !number(s.active.progress,targetSeconds(s))) fail();
-    if (s.phase.endsWith('ready') && s.active.progress !== targetSeconds(s)) fail();
-    if (['incubating','raising'].includes(s.phase) && s.active.progress >= targetSeconds(s)) fail();
+    if (!s.active || !IDS.includes(s.active.id) || !number(s.active.progress,validationTarget)) fail();
+    if (s.phase.endsWith('ready') && s.active.progress !== validationTarget) fail();
+    if (['incubating','raising'].includes(s.phase) && s.active.progress >= validationTarget) fail();
     const pet = s.pets.find(p=>p.id===s.active.id);
     if (['incubating','hatch_ready'].includes(s.phase) ? !!pet : pet?.stage !== 'baby') fail();
   } else if (s.active !== null) fail();
@@ -99,8 +102,12 @@ export function parseSave(text, expectedMode) {
   if (s.phase==='complete' && [3,4,6,18].includes(s.pets.length) && IDS.slice(0,s.pets.length).every(id=>s.pets.some(p=>p.id===id && p.stage==='adult'))) s.phase='idle';
   if (s.phase==='complete' && (s.pets.length!==IDS.length || s.pets.some(p=>p.stage!=='adult'))) fail();
   if (s.phase==='idle' && s.pets.length===IDS.length) fail();
+  if(legacy&&activePhase){
+    const target=targetSeconds(s);
+    if(s.active.progress>=target){s.bank=Math.min(18000,s.bank+s.active.progress-target);s.active.progress=target;s.phase=['incubating','hatch_ready'].includes(s.phase)?'hatch_ready':'growth_ready';}
+  }
   // Return only known fields; never retain arbitrary imported properties.
-  return { schemaVersion: SAVE_VERSION, mode:s.mode, phase:s.phase, active:s.active ? { id:s.active.id, progress:s.active.progress }:null,
+  return { schemaVersion: SAVE_VERSION, balanceVersion:1, mode:s.mode, phase:s.phase, active:s.active ? { id:s.active.id, progress:s.active.progress }:null,
     pets:s.pets.map(p=>({id:p.id,stage:p.stage,nickname:p.nickname,hatchedAt:p.hatchedAt,grownAt:p.grownAt,...(p.care?{care:[...p.care]}:{})})), partner:s.partner,
     bank:s.bank, day:s.day, daily:s.daily, total:s.total, tutorialClaimed:s.tutorialClaimed,
     ...(s.activity?{activity:{enabled:s.activity.enabled,lastBucket:s.activity.lastBucket,since:s.activity.since}}:{}),

@@ -73,12 +73,12 @@ export function parseSave(text, expectedMode) {
   let s; try { s = JSON.parse(text); } catch { throw new Error('JSON 저장 파일을 읽을 수 없습니다.'); }
   const fail = () => { throw new Error('지원하지 않거나 손상된 저장 파일입니다.'); };
   if (!s || s.schemaVersion !== SAVE_VERSION || !Object.hasOwn(MODES,s.mode) || (expectedMode && s.mode !== expectedMode)) fail();
-  if(s.memories!==undefined&&(!Array.isArray(s.memories)||s.memories.length>IDS.length||new Set(s.memories).size!==s.memories.length||s.memories.some(id=>!s.pets.some(p=>p.id===id))))fail();
   const cfg = MODES[s.mode];
   if(s.activity!==undefined&&(!s.activity||typeof s.activity.enabled!=='boolean'||!Number.isSafeInteger(s.activity.lastBucket)||s.activity.lastBucket<0||!Number.isSafeInteger(s.activity.since)||s.activity.since<0))fail();
   if (!['idle','incubating','hatch_ready','raising','growth_ready','complete'].includes(s.phase)) fail();
   if (!Array.isArray(s.pets) || s.pets.length > IDS.length || new Set(s.pets.map(p=>p?.id)).size !== s.pets.length) fail();
   for (const p of s.pets) if (!p || !IDS.includes(p.id) || !['baby','adult'].includes(p.stage) || typeof p.nickname !== 'string' || p.nickname.length > 20 || !validDate(p.hatchedAt) || (p.stage === 'adult' ? !validDate(p.grownAt) : p.grownAt !== null)) fail();
+  if(s.memories!==undefined&&(!Array.isArray(s.memories)||s.memories.length>IDS.length||new Set(s.memories).size!==s.memories.length||s.memories.some(id=>!s.pets.some(p=>p.id===id))))fail();
   for(const p of s.pets)if(p.care!==undefined&&(!Array.isArray(p.care)||p.care.length>2||new Set(p.care).size!==p.care.length||p.care.some(stage=>stage!=='baby'&&(stage!=='adult'||p.stage!=='adult'))))fail();
   if (s.partner !== null && !s.pets.some(p=>p.id===s.partner)) fail();
   if (s.pets.length && s.partner === null) fail();

@@ -42,11 +42,12 @@ Choose an egg, hatch a fantasy pet, and watch it grow with each focus session.
 
 **Description**
 
-Start with one little egg. Meet a forest dragon, a pegasus, or a three-headed puppy, and watch your companion grow as you spend time in your garden.
+Start with one little egg. Meet a forest dragon, a pegasus, or an ember-tailed puppy, and watch your companion grow as you spend time in your garden.
 
-- Eighteen companions across three habitats, each with baby and grown forms.
+- Thirty companions across five habitats, each with baby and grown forms.
 - Your first egg hatches instantly. Try the quick demo to see growth in 30 seconds.
 - Pick a partner, give it a nickname, and collect its story in your journal.
+- Discover 30 memory cards, 15 friendship stories, and 14 milestones.
 - No account required. Progress stays on your device, with save-file export and import.
 - Save a picture of your garden to share. Nicknames and focus time are excluded from the picture.
 

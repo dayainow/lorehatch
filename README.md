@@ -173,7 +173,7 @@ Near-term priorities are broader Mac interaction testing, English game UI, and a
 
 The local v0.6.0 build includes the redesigned starters, all 30 species, the memory journal, desktop companion controls, and the experimental AI hook. The 30-species expansion has passed automated checks and a Mac GUI pass for new habitat listings, element filtering, locked details, and journal totals. Full new-species playthroughs are still needed. These changes are not a public release announcement.
 
-- **Verified:** 39 automated tests passed; the previous 18-species Mac build was checked for a complete memory encounter and journal recording, care persistence, and companion visibility and sizing.
+- **Verified:** 40 automated tests passed; the previous 18-species Mac build was checked for a complete memory encounter and journal recording, care persistence, and companion visibility and sizing.
 - **Still to validate:** live Claude Code integration, all 30 encounters in the GUI, and broader multi-monitor and long-running Mac behavior. Signing and notarization for public distribution remain unfinished.
 
 [Memory journal implementation notes (Korean)](docs/26-memory-journal.md) · [AI setup and limitations](docs/24-ai-activity.md).

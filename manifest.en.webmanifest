@@ -1,0 +1,32 @@
+{
+  "id": "./",
+  "name": "Moamon: Little Desktop Companions",
+  "short_name": "Moamon",
+  "lang": "en",
+  "description": "Hatch and grow 30 little pixel companions in your local garden",
+  "start_url": "./?lang=en",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f1e8",
+  "theme_color": "#f4f1e8",
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

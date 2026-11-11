@@ -1,7 +1,7 @@
 import { cp, mkdir, rm, readdir, readFile, writeFile } from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 await rm('dist',{recursive:true,force:true});await mkdir('dist');
-for (const path of ['index.html','manifest.webmanifest','app','data','assets']) await cp(path,`dist/${path}`,{recursive:true});
+for (const path of ['index.html','manifest.webmanifest','manifest.en.webmanifest','app','data','assets']) await cp(path,`dist/${path}`,{recursive:true});
 // Concept sheets and development-sized icon sources are not runtime dependencies.
 await rm('dist/assets/concepts',{recursive:true,force:true});
 let assets=['./'];const hash=createHash('sha256');

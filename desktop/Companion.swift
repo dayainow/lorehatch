@@ -1,5 +1,46 @@
 import Cocoa
 
+func moamonLocale() -> String { (UserDefaults.standard.string(forKey:"moamonLanguage") ?? Locale.preferredLanguages.first ?? "en").hasPrefix("ko") ? "ko" : "en" }
+let moamonTranslations: [String:String] = [
+"돌보고 반응 보기":"Care and reactions",
+"정원 열기":"Open garden",
+"작게 보기":"Small companion",
+"크게 보기":"Large companion",
+"펫 숨기기":"Hide companion",
+"클릭해 돌보기 · 끌어서 이동 · 두 번 클릭해 정원 열기":"Click for care · drag to move · double-click for garden",
+"화면에 펫 띄우기":"Show desktop companion",
+"정원이 이미 실행 중이에요. 메뉴바에서 정원을 열어주세요.":"The garden is already running. Open it from the menu bar.",
+"정원을 열지 못했어요":"Could not open the garden",
+"모아몬":"Moamon",
+"모아몬에 관하여":"About Moamon",
+"모아몬 숨기기":"Hide Moamon",
+"모아몬 종료":"Quit Moamon",
+"편집":"Edit",
+"실행 취소":"Undo",
+"잘라내기":"Cut",
+"복사":"Copy",
+"붙여넣기":"Paste",
+"전체 선택":"Select All",
+"알을 고를 준비가 됐어요":"Ready to choose an egg",
+"첫 알 고르기":"Choose your first egg",
+"항상 위에 표시":"Keep on top",
+"저장 폴더 열기":"Open save folder",
+"종료":"Quit",
+"계속하기":"Continue",
+"취소":"Cancel",
+"모아몬 0.7.0":"Moamon 0.7.0",
+"로컬 저장으로 키우는 작은 도트 펫 정원\n앱 창이 보일 때 함께한 시간을 반영해요.\n메뉴바에서 다시 열거나 항상 위에 둘 수 있어요.":"A local-first pixel companion garden.\nTime counts while the garden is visible.\nUse the menu bar to reopen it or keep it on top."
+]
+func L(_ text:String) -> String { moamonLocale()=="en" ? (moamonTranslations[text] ?? text) : text }
+func localizeMenu(_ menu:NSMenu?) {
+ guard let menu else{return}
+ for item in menu.items {
+  let original=moamonTranslations.first(where:{$0.value==item.title})?.key ?? item.title
+  item.title=L(original);localizeMenu(item.submenu)
+ }
+}
+
+
 // Render the bundled 32-pixel rectangle sprites without a second web view.
 private final class PixelArt: NSObject, XMLParserDelegate {
     var pixels: [(NSRect, NSColor)] = []
@@ -47,7 +88,7 @@ final class CompanionView: NSView {
     override func rightMouseDown(with event: NSEvent) { showActions() }
     @objc private func showActions() {
         let menu=NSMenu()
-        for (title,action) in [("돌보고 반응 보기",#selector(careNow)),("정원 열기",#selector(garden)),("작게 보기",#selector(small)),("크게 보기",#selector(large)),("펫 숨기기",#selector(hide))] {
+        for (title,action) in [(L("돌보고 반응 보기"),#selector(careNow)),(L("정원 열기"),#selector(garden)),(L("작게 보기"),#selector(small)),(L("크게 보기"),#selector(large)),(L("펫 숨기기"),#selector(hide))] {
             let item=NSMenuItem(title:title,action:action,keyEquivalent:"");item.target=self;menu.addItem(item)
         }
         menu.popUp(positioning:nil,at:NSPoint(x:bounds.midX,y:bounds.midY),in:self)

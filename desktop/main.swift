@@ -94,14 +94,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             UserDefaults.standard.set(Double(size),forKey:"companionSize")
             self.restoreCompanionPosition()
         }
-        companionView.toolTip="클릭해 돌보기 · 끌어서 이동 · 두 번 클릭해 정원 열기"
+        companionView.toolTip=L("클릭해 돌보기 · 끌어서 이동 · 두 번 클릭해 정원 열기")
         companionPanel=panel
         let size=UserDefaults.standard.double(forKey:"companionSize")==144 ? 144.0 : 96.0
         panel.setContentSize(NSSize(width:size,height:size))
         if let saved=UserDefaults.standard.string(forKey:"companionOrigin") { panel.setFrameOrigin(NSPointFromString(saved)) }
         restoreCompanionPosition()
         observers.append(NotificationCenter.default.addObserver(forName:NSApplication.didChangeScreenParametersNotification,object:nil,queue:.main){[weak self] _ in self?.restoreCompanionPosition()})
-        companionItem.title="화면에 펫 띄우기";companionItem.target=self;companionItem.action=#selector(toggleCompanion)
+        companionItem.title=L("화면에 펫 띄우기");companionItem.target=self;companionItem.action=#selector(toggleCompanion)
         if UserDefaults.standard.object(forKey:"showCompanion") as? Bool ?? true { panel.orderFrontRegardless();companionItem.state = .on }
         companionView.showSprite(companionKey,reduced:companionStill)
     }
@@ -129,24 +129,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             let dataRoot = ProcessInfo.processInfo.environment["LOREHATCH_DATA_DIR"].map { URL(fileURLWithPath: $0) } ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("Lorehatch")
             try FileManager.default.createDirectory(at: dataRoot, withIntermediateDirectories: true)
             lockDescriptor = open(dataRoot.appendingPathComponent(".lock").path, O_CREAT | O_RDWR, 0o600)
-            guard lockDescriptor >= 0, flock(lockDescriptor, LOCK_EX | LOCK_NB) == 0 else { fatal("정원이 이미 실행 중이에요. 메뉴바에서 정원을 열어주세요."); return }
+            guard lockDescriptor >= 0, flock(lockDescriptor, LOCK_EX | LOCK_NB) == 0 else { fatal(L("정원이 이미 실행 중이에요. 메뉴바에서 정원을 열어주세요.")); return }
             store = try SaveStore(folder: dataRoot)
             guard let root = Bundle.main.resourceURL?.appendingPathComponent("site") else { throw StoreError.corrupt }
             site = try LocalSite(root: root)
             site.start(ready: { [weak self] in self?.createWindow() }, failed: { [weak self] in self?.fatal($0) })
         } catch { fatal(error.localizedDescription) }
     }
-    func fatal(_ message: String) { let alert=NSAlert(); alert.messageText="정원을 열지 못했어요"; alert.informativeText=message; alert.runModal(); NSApp.terminate(nil) }
+    func fatal(_ message: String) { let alert=NSAlert(); alert.messageText=L("정원을 열지 못했어요"); alert.informativeText=message; alert.runModal(); NSApp.terminate(nil) }
     func createWindow() {
         let config = WKWebViewConfiguration()
         let script = """
-        (()=>{const request=(action,payload={})=>{const reply=JSON.parse(prompt('__LOREHATCH_NATIVE__',JSON.stringify({action,...payload})));if(reply.error)throw Error(reply.error);return reply.value;};window.lorehatchDesktop={...request('status'),companion:command=>request('companion',{command}),react:()=>request('react'),menu:(line,label,sprite,still)=>request('menu',{line,label,sprite,still}),storage:{getItem:key=>request('get',{key}),setItem:(key,value)=>request('set',{key,value}),removeItem:key=>request('remove',{key})},download:(name,base64)=>request('download',{name,base64})};})();
+        (()=>{const request=(action,payload={})=>{const reply=JSON.parse(prompt('__LOREHATCH_NATIVE__',JSON.stringify({action,...payload})));if(reply.error)throw Error(reply.error);return reply.value;};window.lorehatchDesktop={...request('status'),language:locale=>request('language',{locale}),companion:command=>request('companion',{command}),react:()=>request('react'),menu:(line,label,sprite,still)=>request('menu',{line,label,sprite,still}),storage:{getItem:key=>request('get',{key}),setItem:(key,value)=>request('set',{key,value}),removeItem:key=>request('remove',{key})},download:(name,base64)=>request('download',{name,base64})};})();
         """
         config.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentStart, forMainFrameOnly: true))
         web = WKWebView(frame: .zero, configuration: config); web.navigationDelegate=self; web.uiDelegate=self
         web.setValue(false, forKey: "drawsBackground")
         window = NSWindow(contentRect: NSRect(x:0,y:0,width:1180,height:820), styleMask:[.titled,.closable,.miniaturizable,.resizable], backing:.buffered, defer:false)
-        window.title="모아몬"; window.minSize=NSSize(width:390,height:600); window.contentView=web; window.delegate=self; window.isReleasedWhenClosed=false
+        window.title=L("모아몬"); window.minSize=NSSize(width:390,height:600); window.contentView=web; window.delegate=self; window.isReleasedWhenClosed=false
         window.setFrameAutosaveName("LorehatchMainWindow"); window.center(); window.makeKeyAndOrderFront(nil)
         buildMenus(); web.load(URLRequest(url:site.home));
         activityTimer=Timer.scheduledTimer(withTimeInterval:5,repeats:true){[weak self] _ in
@@ -161,22 +161,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     }
     func buildMenus() {
         let menu=NSMenu(); let appItem=NSMenuItem(); let appMenu=NSMenu()
-        appMenu.addItem(withTitle:"모아몬에 관하여",action:#selector(showAbout),keyEquivalent:"")
-        appMenu.addItem(.separator()); appMenu.addItem(withTitle:"모아몬 숨기기",action:#selector(NSApplication.hide(_:)),keyEquivalent:"h")
-        appMenu.addItem(withTitle:"모아몬 종료",action:#selector(NSApplication.terminate(_:)),keyEquivalent:"q"); appItem.submenu=appMenu; menu.addItem(appItem)
-        let editItem=NSMenuItem(); let edit=NSMenu(title:"편집")
-        for (title,selector,key) in [("실행 취소","undo:","z"),("잘라내기","cut:","x"),("복사","copy:","c"),("붙여넣기","paste:","v"),("전체 선택","selectAll:","a")] {edit.addItem(withTitle:title,action:Selector(selector),keyEquivalent:key)}
+        appMenu.addItem(withTitle:L("모아몬에 관하여"),action:#selector(showAbout),keyEquivalent:"")
+        appMenu.addItem(.separator()); appMenu.addItem(withTitle:L("모아몬 숨기기"),action:#selector(NSApplication.hide(_:)),keyEquivalent:"h")
+        appMenu.addItem(withTitle:L("모아몬 종료"),action:#selector(NSApplication.terminate(_:)),keyEquivalent:"q"); appItem.submenu=appMenu; menu.addItem(appItem)
+        let editItem=NSMenuItem(); let edit=NSMenu(title:L("편집"))
+        for (title,selector,key) in [(L("실행 취소"),"undo:","z"),(L("잘라내기"),"cut:","x"),(L("복사"),"copy:","c"),(L("붙여넣기"),"paste:","v"),(L("전체 선택"),"selectAll:","a")] {edit.addItem(withTitle:title,action:Selector(selector),keyEquivalent:key)}
         editItem.submenu=edit;menu.addItem(editItem); NSApp.mainMenu=menu
         statusItem=NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
-        statusItem.button?.image=NSImage(systemSymbolName:"leaf",accessibilityDescription:"모아몬")
+        statusItem.button?.image=NSImage(systemSymbolName:"leaf",accessibilityDescription:L("모아몬"))
         let status=NSMenu()
-        petStatus.title="알을 고를 준비가 됐어요"; status.addItem(petStatus)
-        careAction.title="첫 알 고르기"; careAction.target=self; careAction.action=#selector(careFromMenu)
+        petStatus.title=L("알을 고를 준비가 됐어요"); status.addItem(petStatus)
+        careAction.title=L("첫 알 고르기"); careAction.target=self; careAction.action=#selector(careFromMenu)
         setupCompanion();status.addItem(companionItem);status.addItem(careAction); status.addItem(.separator())
-        status.addItem(withTitle:"정원 열기",action:#selector(showWindow),keyEquivalent:"")
-        status.addItem(withTitle:"항상 위에 표시",action:#selector(toggleFloating),keyEquivalent:"")
-        status.addItem(withTitle:"저장 폴더 열기",action:#selector(showData),keyEquivalent:"")
-        status.addItem(.separator());status.addItem(withTitle:"종료",action:#selector(NSApplication.terminate(_:)),keyEquivalent:"");statusItem.menu=status
+        status.addItem(withTitle:L("정원 열기"),action:#selector(showWindow),keyEquivalent:"")
+        status.addItem(withTitle:L("항상 위에 표시"),action:#selector(toggleFloating),keyEquivalent:"")
+        status.addItem(withTitle:L("저장 폴더 열기"),action:#selector(showData),keyEquivalent:"")
+        status.addItem(.separator());status.addItem(withTitle:L("종료"),action:#selector(NSApplication.terminate(_:)),keyEquivalent:"");statusItem.menu=status
     }
     @objc func careFromMenu(){
         showWindow()
@@ -185,7 +185,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     @objc func showWindow(){window.makeKeyAndOrderFront(nil);NSApp.activate(ignoringOtherApps:true)}
     @objc func toggleFloating(_ sender:NSMenuItem){let enabled=window.level != .floating;window.level=enabled ? .floating : .normal;sender.state=enabled ? .on : .off}
     @objc func showData(){NSWorkspace.shared.open(store.folder)}
-    @objc func showAbout(){let alert=NSAlert();alert.messageText="모아몬 0.6.0";alert.informativeText="로컬 저장으로 키우는 작은 도트 펫 정원\n앱 창이 보일 때 함께한 시간을 반영해요.\n메뉴바에서 다시 열거나 항상 위에 둘 수 있어요.";alert.runModal()}
+    @objc func showAbout(){let alert=NSAlert();alert.messageText=L("모아몬 0.7.0");alert.informativeText=L("로컬 저장으로 키우는 작은 도트 펫 정원\n앱 창이 보일 때 함께한 시간을 반영해요.\n메뉴바에서 다시 열거나 항상 위에 둘 수 있어요.");alert.runModal()}
     func windowShouldClose(_ sender: NSWindow)->Bool { web.evaluateJavaScript("window.dispatchEvent(new Event('lorehatch-suspend'))");sender.orderOut(nil);return false }
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows:Bool)->Bool{showWindow();return true}
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply {
@@ -205,7 +205,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         else {if action.navigationType == .linkActivated,url.scheme=="https"{NSWorkspace.shared.open(url)};decisionHandler(.cancel)}
     }
     func webView(_ webView:WKWebView,createWebViewWith configuration:WKWebViewConfiguration,for action:WKNavigationAction,windowFeatures:WKWindowFeatures)->WKWebView?{if let url=action.request.url,url.scheme=="https"{NSWorkspace.shared.open(url)};return nil}
-    func webView(_ webView:WKWebView,runJavaScriptConfirmPanelWithMessage message:String,initiatedByFrame frame:WKFrameInfo,completionHandler:@escaping(Bool)->Void){let alert=NSAlert();alert.messageText=message;alert.addButton(withTitle:"계속하기");alert.addButton(withTitle:"취소");completionHandler(alert.runModal() == .alertFirstButtonReturn)}
+    func webView(_ webView:WKWebView,runJavaScriptConfirmPanelWithMessage message:String,initiatedByFrame frame:WKFrameInfo,completionHandler:@escaping(Bool)->Void){let alert=NSAlert();alert.messageText=message;alert.addButton(withTitle:L("계속하기"));alert.addButton(withTitle:L("취소"));completionHandler(alert.runModal() == .alertFirstButtonReturn)}
     func webView(_ webView:WKWebView,runJavaScriptTextInputPanelWithPrompt prompt:String,defaultText:String?,initiatedByFrame frame:WKFrameInfo,completionHandler:@escaping(String?)->Void){
         guard prompt=="__LOREHATCH_NATIVE__",frame.isMainFrame,frame.request.url?.host=="127.0.0.1",frame.request.url?.port==Int(site.port) else{completionHandler(nil);return}
         do {
@@ -241,7 +241,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
                 }
                 petStatus.title=String(line.prefix(80)); careAction.title=String(label.prefix(30))
                 statusItem.button?.toolTip=petStatus.title
-            case "status": result = ["warning":store.warning,"blocked":store.blocked]
+            case "language":
+                guard let locale=object["locale"] as? String,["en","ko"].contains(locale) else{throw StoreError.invalidValue}
+                UserDefaults.standard.set(locale,forKey:"moamonLanguage")
+                localizeMenu(NSApp.mainMenu);localizeMenu(statusItem.menu);window.title=L("모아몬")
+                companionView.toolTip=L("클릭해 돌보기 · 끌어서 이동 · 두 번 클릭해 정원 열기")
+            case "status": result = ["warning":store.warning,"blocked":store.blocked,"locale":moamonLocale()]
             case "get":result=try store.get(object["key"] as? String ?? "") as Any? ?? NSNull()
             case "set":guard let value=object["value"] as? String else{throw StoreError.invalidValue};try store.set(object["key"] as? String ?? "",value:value)
             case "remove":try store.set(object["key"] as? String ?? "",value:nil)

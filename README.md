@@ -1,91 +1,65 @@
 <div align="center">
 
-[English](README.md) · [한국어](README.ko.md)
+**English** · [한국어](README.ko.md)
 
 # Moamon
 
-**Hatch a friend. Grow a little world.**
+**A little friend grows while you work.**
 
-A cozy pixel-pet garden. Choose an egg, spend a little time together,<br>
-and discover the friendships that make your garden feel like home.
+Choose an egg. Meet your companion. Build a garden of small, shared stories.
 
-[**Play the browser alpha ↗**](https://dayainow.github.io/lorehatch/) · [**Get Moamon ↓**](#get-moamon) · [**Give it a star ☆**](https://github.com/dayainow/lorehatch)
+[**Play in English ↗**](https://dayainow.github.io/lorehatch/?lang=en) · [**30-second demo**](https://dayainow.github.io/lorehatch/?lang=en&mode=demo) · [**Star on GitHub ☆**](https://github.com/dayainow/lorehatch)
 
-![Development status: alpha](https://img.shields.io/badge/status-alpha-c7d9a8?style=flat-square&labelColor=243c32)
-![Platforms: Web and macOS](https://img.shields.io/badge/platforms-Web%20%2B%20macOS-e9d9b5?style=flat-square&labelColor=243c32)
-![Game language: Korean](https://img.shields.io/badge/game%20language-Korean-cbdfe4?style=flat-square&labelColor=243c32)
+**Web alpha · 30 species · English & Korean · Local saves**
 
 </div>
 
-![Moamon — three original pixel companions in a quiet green garden](docs/media/moamon-cover.svg)
-
-<p align="center"><sub>Original character artwork from the current development build. The public browser alpha is an earlier build.</sub></p>
-
-![Moamon garden — local Mac alpha interface](docs/screenshots/v06-garden-redesign.jpg)
-
-<sub>Earlier interface capture; see the updated starter artwork below.</sub>
+![The English Moamon garden with Kokodu, the ember puppy](docs/screenshots/v07-garden-en.jpg)
 
 ## Your next break has a tiny face
 
-A leaf-winged dragon soaking up sunlight. A little Pegasus practicing its landing. An affectionate puppy with charcoal ears and a tiny ember tail.
+Moruip unfolds its leaf wings in the sun. Poru practices a careful landing. Kokodu greets your hand with a warm little nose.
 
-Moamon turns a focus session into a small, visible change in a friend you chose. Your first egg hatches immediately. Keep the garden open, start a session, and watch your companion grow. When you return, there is another reaction to discover—and another friend to meet.
+Your first egg hatches immediately. Choose **Work together** and keep the garden visible: your baby grows in **15 minutes**. Later eggs hatch in **5 minutes**. There is no hunger meter, lost streak, or penalty for taking a day off.
 
-**Choose an egg → hatch → focus together → grow → discover a friendship.**
+**Choose an egg → hatch → work together → grow → discover a friendship.**
 
-No hunger meter. No lost streaks. No punishment for taking a day off.
+## Thirty friends. Five places to call home.
 
-## Three eggs. Three very different friends.
+- **30 species, 60 appearances.** Every friend has a baby and grown form. A growth stage is not a separate species.
+- **Five connected habitats.** Grow the six residents of each habitat to unlock the next: Three Springs Forest, Reed Marsh, Starlight Ridge, Shell Shore, and Breezy Meadow.
+- **15 friendship stories.** Grow and care for both friends in a pair to discover their shared ending.
+- **30 memory cards.** Help a friend in a short choice-based encounter. Wrong choices have no penalty.
+- **14 milestones.** Earlier collection achievements remain earned as you discover the expanded garden.
 
-- **모루잎 · Grass:** a round little forest dragon with folded leaf ears and a vine tail. Growing up reveals broad leaf wings and a fresh sprout.
-- **포루 · Water:** a tiny Pegasus with a droplet forelock and rippling wings. Its wings spread wider as it grows.
-- **코코두 · Fire:** an affectionate ember puppy with charcoal ears and one little face. Its tiny ember tail grows longer, and a fluffy fire ruff appears.
+![All 30 original Moamon companions, grouped by habitat](docs/media/moamon-roster-en.svg)
 
-![The three starters — actual baby and grown pixel sprites](docs/media/starter-growth.svg)
+The longer-term ambition is 120 species. **This alpha contains 30**, each with one growth step after hatching. Combat and branching evolution are not implemented.
 
-**Egg → baby → grown companion.** Each species currently grows once after hatching, keeping its name and identity. Branching or three-stage evolution is not implemented. Fire, water, and grass are character affinities; there is no combat system yet. [Starter design notes (Korean)](docs/27-starter-growth.md).
+## Start in a minute
 
-## A garden worth getting to know
+1. [Open the English garden](https://dayainow.github.io/lorehatch/?lang=en) and choose a fire, water, or grass egg.
+2. Hatch your friend, then choose **Work together**. **No limit** keeps the session going until you pause or growth is ready.
+3. Open the field guide to discover its care reaction. Visit Memories for its little request.
+4. Reveal its grown form, care for it again, and find the friend in its relationship hint.
 
-- **30 species, 60 appearances.** Every friend has a baby and grown form, a personality, and something they love. Growth stages count as one species.
-- **Five connected habitats.** Raise the six residents of one habitat to unlock the next set of eggs. Preview the whole collection in the field guide.
-- **Fifteen little friendship stories.** Raise and care for both friends in a pair to discover their shared ending. Your next egg suggestions help you find the missing friend.
-- **Care with character.** Warm a leaf-wing in the sun, brush seeds from a rabbit’s ears, or leave a stepping stone by the water. Baby and grown friends respond differently.
-- **A companion on your Mac.** Keep your selected partner on screen, drag it to a comfortable spot, and open its care menu with a click.
+The [quick demo](https://dayainow.github.io/lorehatch/?lang=en&mode=demo) uses a separate save, with 15-second hatching and 30-second growth. Regular growth is capped at 150 credited minutes per day.
 
-![All 30 current species, shown in their grown forms](docs/media/moamon-roster.svg)
+**Manual growth counts only while the garden view is visible and the session is running.** Switching tabs, hiding the view, or sleeping pauses it. Background computer-usage tracking is not implemented.
 
-<p align="center"><sub>Current development roster. The long-term goal is 120 species; 30 are implemented today.</sub></p>
+## Pick your language. Keep your garden.
 
-## A collection beyond the creatures
+Use the language button at the top to switch between English and Korean. Navigation, the field guide, care reactions, encounters, memories, and settings follow your choice. Your progress and personal nicknames stay unchanged. The first visit follows your browser language; a `lang=en` or `lang=ko` link takes priority.
 
-The current development build adds **30 choice-based encounters**, **30 memory cards**, and **14 collection milestones**. Meet a friend in the garden, choose a small way to help, and keep the moment in your memory journal. Owned friends remain available at any time; there are no missed-day penalties or duplicate card rewards.
+## Play, download, or build
 
-## Small gestures. Shared stories.
+[**Browser alpha**](https://dayainow.github.io/lorehatch/?lang=en) · [**Release downloads**](https://github.com/dayainow/lorehatch/releases) · [**Source ZIP**](https://github.com/dayainow/lorehatch/archive/refs/heads/main.zip)
 
-The leaf dragon can make a cup from its wings. The Pegasus can carry the water. Together, they have something neither could make alone.
+The browser is the primary public alpha. The web ZIP is a static-site bundle for local hosting, not a desktop installer. The source ZIP contains source code.
 
-The field guide records each friend’s care reactions and the progress of their shared story. Care is optional, and repeated clicks do not speed up growth. The reward is getting to know your companions.
+**Mac development build:** a floating companion, menu-bar controls, size and position preferences, and local save recovery are implemented. Local universal packages target macOS 13+ on Apple Silicon and Intel. They are ad-hoc signed, **not Developer ID signed or notarized**, and are not presented as a ready-to-install public Mac release. Moamon is not listed in an app store.
 
-![Actual Mac alpha screenshot showing a leaf dragon’s care action and recorded response in Korean](docs/screenshots/v06-care.jpg)
-
-<sub>Earlier local Mac alpha capture, before the starter artwork update. The game interface is currently Korean; this README is available in English and Korean.</sub>
-
-## Get Moamon
-
-### Play in your browser
-
-[**Open the public alpha**](https://dayainow.github.io/lorehatch/) · [**Try the fast-growth demo**](https://dayainow.github.io/lorehatch/?mode=demo)
-
-No account required. The demo uses separate progress. **The public alpha is an earlier build and does not include all the features pictured above.**
-
-### Download and build the current project
-
-[**Download source ZIP**](https://github.com/dayainow/lorehatch/archive/refs/heads/main.zip) · [**Check GitHub Releases**](https://github.com/dayainow/lorehatch/releases)
-
-**There is no public prebuilt app release yet.** The source ZIP contains the published branch, which can lag behind development. It is source code, not a one-click installer. Current local macOS packages support Apple Silicon and Intel on macOS 13+, but Developer ID signing and notarization remain unfinished. Moamon is not listed in the Mac App Store or Chrome Web Store.
-
-To run the published source, install Node.js 22+ and use:
+To run the source with Node.js 22+:
 
 ```sh
 git clone https://github.com/dayainow/lorehatch.git
@@ -93,10 +67,10 @@ cd lorehatch
 npm run dev
 ```
 
-Open [localhost:4173](http://127.0.0.1:4173/). No npm dependencies are required to run the game. Stop with `Ctrl+C`.
+Open [localhost:4173](http://127.0.0.1:4173/?lang=en). No runtime npm dependencies are required.
 
 <details>
-<summary><strong>Build the current checkout for web or Mac</strong></summary>
+<summary>Build and verify</summary>
 
 ```sh
 npm test
@@ -105,87 +79,42 @@ npm run build
 npm run package:web
 ```
 
-`dist/` contains the static site. The web packaging command requires `zip` and `unzip`.
+The site is written to `dist/`; the web ZIP is written to `release/`. Packaging needs `zip` and `unzip`.
 
-On a Mac with Xcode Command Line Tools:
+On macOS with Xcode Command Line Tools:
 
 ```sh
 npm run package:mac
 ```
 
-The app is written to `build/desktop/Lorehatch.app`, with a universal ZIP in `release/`. `lorehatch` is the repository and internal bundle name; the product is Moamon. Packaging uses ad-hoc signing, not Developer ID signing or notarization.
+The application is written to `build/desktop/Lorehatch.app`. `lorehatch` remains the repository and internal bundle identifier; the product is Moamon.
 
 </details>
-
-## Your first few minutes
-
-1. **Pick your first friend.** Choose a fire, water, or grass egg and confirm its instant hatch.
-2. **Start a focus session.** Choose 5, 15, or 30 minutes—or an open-ended session.
-3. **Visit the field guide.** Open your friend and try its care action. Come back after growth for a different reaction.
-4. **Keep a memory.** Open the memory journal, meet an owned friend, and choose how to help. A wrong choice costs nothing; try again.
-5. **Find its friend.** Check the relationship hint and choose the next egg when it becomes available.
-
-The normal garden uses 5 minutes to hatch later eggs and 15 minutes to grow a baby, with up to 150 minutes credited per day. The fast demo uses 15 seconds to hatch and 30 seconds to grow. These values are still being playtested.
-
-**Manual focus time accrues while the garden view is visible and a session is running.** Hiding the garden, switching away from the browser tab, or locking the screen pauses progress. A floating desktop pet does not mean background focus time is being counted.
-
-<details>
-<summary><strong>Quick guide to the Korean buttons</strong></summary>
-
-- **첫 알 고르기** — Choose your first egg
-- **같이 작업하기** — Start focusing
-- **성장한 모습 보기** — Reveal the grown form
-- **도감** — Field guide
-- **내 펫** — My pets
-- **추억** — Memory journal
-- **정원 설정** — Garden settings
-- **파일 내보내기 / 파일 가져오기** — Export / import progress
-
-</details>
-
-## Make room on your desktop
-
-In the Mac build, click your floating companion for care, size, and visibility options. Drag to move it; double-click to open the garden. Position and size are remembered.
-
-Lost your friend? Open garden settings and use the desktop companion controls to bring it back to the bottom-right of your screen. The menu bar also lets you reopen the garden and show or hide the pet.
 
 ## Your garden stays yours
 
-Progress is stored locally in the browser or Mac app. There is no automatic cloud sync. Export your progress before moving browsers, devices, or app installations, then import it into the same mode on the new installation.
+Progress stays on your device. There is no account or automatic cloud sync. Export progress in settings before moving devices, browsers, or app installations, and import it into the same mode.
 
-Moamon does not collect task contents, keystrokes, or clipboard data, and includes no analytics tracking. Hosting providers may process ordinary access logs. Share cards include collected pets and growth counts, without nicknames or focus time.
+Moamon does not collect task content, keystrokes, or clipboard data and includes no analytics. Hosting providers may process ordinary access logs. Share cards omit nicknames and session time.
 
-## Grow alongside your AI work · experimental
+The local Mac build also includes an **experimental Claude Code completion hook**. It reads completion timestamps, not conversations or token counts. It needs explicit setup; live-provider validation remains unfinished. [Setup and limitations](docs/24-ai-activity.md).
 
-The current local Mac build includes an **experimental Claude Code completion hook**. With the Mac app running, the first egg hatched, the setting enabled, and the hook configured, new completion signals grant one growth minute per minute bucket, without reading conversations or token counts. It requires a one-time hook setup and is not yet validated with live Claude Code sessions. [Setup and limitations](docs/24-ai-activity.md). Manual focus remains available.
+## Alpha status
 
-[Design and launch plan (Korean)](docs/23-ai-companion-and-launch.md). Inspired by the clear connection between AI usage and desktop companionship in [PokeTokenBar](https://github.com/chattymin/PokeTokenBar), with Moamon’s own creatures and friendship stories.
+The automated checks cover growth, save recovery and migration, collection completion, care, memories, offline navigation, and translation coverage. Browser checks cover English hatching, care, memory collection, language switching, and field-guide browsing. These checks do not establish customer validation or full device coverage.
 
-## Help this little world grow
+Before a general Mac release, Developer ID signing, notarization, broader native playtesting, and live AI integration testing remain. Background growth is a separate product feature, not a claim of this release.
 
-If you would like more tiny companions on your desk, **[star Moamon on GitHub](https://github.com/dayainow/lorehatch)**. It helps others discover the project and tells us this is a world worth growing.
+Found a problem or a friend you would love to meet? [Open an issue](https://github.com/dayainow/lorehatch/issues) with your platform and reproduction steps. Please keep private save files out of public issues.
 
-Tried the alpha? Tell us which friend you chose, where you got stuck, or what made you want another egg. [Report a bug or suggest an idea](https://github.com/dayainow/lorehatch/issues). English and Korean feedback are welcome. Include your platform, game mode, and reproduction steps; keep private save files out of public issues.
+## Credits
 
-Near-term priorities are broader Mac interaction testing, English game UI, and a publicly downloadable Mac alpha. The 120-species collection is a longer-term goal, not the current release size.
+Sprites are original, code-authored pixel artwork. Traditional motifs and fictional garden adaptations are documented separately. No third-party game artwork or sprites are included. Pretendard is distributed under the [SIL Open Font License](assets/fonts/OFL.txt).
 
-## Development snapshot · November 5, 2026
+The repository has no project-wide open-source license. Public access is not a grant to redistribute its code or characters. Moamon is a working name, not a claim of trademark clearance.
 
-The local v0.6.0 build includes the redesigned starters, all 30 species, the memory journal, desktop companion controls, and the experimental AI hook. The 30-species expansion has passed automated checks and a Mac GUI pass for new habitat listings, element filtering, locked details, and journal totals. Full new-species playthroughs are still needed. These changes are not a public release announcement.
-
-- **Verified:** 41 automated tests passed; the previous 18-species Mac build was checked for a complete memory encounter and journal recording, care persistence, and companion visibility and sizing.
-- **Still to validate:** live Claude Code integration, all 30 encounters in the GUI, and broader multi-monitor and long-running Mac behavior. Signing and notarization for public distribution remain unfinished.
-
-[Memory journal implementation notes (Korean)](docs/26-memory-journal.md) · [AI setup and limitations](docs/24-ai-activity.md).
-
-## Credits and project status
-
-Moamon is an independent alpha project. Its sprites are original, code-authored pixel assets. Folklore references and fictional adaptations are documented separately. [Source and rights notes](docs/07-sources-rights.md) · [World and care design](docs/22-world-and-care.md) · [Installation notes](docs/17-install.md) (Korean).
-
-Pretendard is distributed under its [SIL Open Font License](assets/fonts/OFL.txt). A project-wide license has not been selected; public source access does not grant general redistribution rights to the code or characters. Moamon is a working name, not a claim of trademark clearance.
-
-README presentation references: [VS Code Pets](https://github.com/tonybaloney/vscode-pets) for a short introduction and quick-start flow, and [Desktop Pet / eSheep](https://github.com/Adrianotiger/desktopPet) for platform-specific download clarity. No artwork, sprites, or prose were copied.
+Presentation references include [VS Code Pets](https://github.com/tonybaloney/vscode-pets), [Desktop Pet](https://github.com/Adrianotiger/desktopPet), and [PokeTokenBar](https://github.com/chattymin/PokeTokenBar). Their artwork and prose were not copied.
 
 ---
 
-<p align="center"><strong>One egg. One little friend. A reason to come back.</strong><br><br><a href="https://dayainow.github.io/lorehatch/">Play the alpha</a> · <a href="https://github.com/dayainow/lorehatch">Star Moamon</a> · <a href="README.ko.md">한국어로 읽기</a></p>
+**One egg. One little friend. A reason to come back.**

@@ -1,3 +1,4 @@
+import {locale,setLocale,translateText as t,localize} from './i18n.mjs';
 import {encounters,rememberEncounter,visitorFor,milestones} from './journal.mjs';
 import {connectActivity,creditActivity} from './activity.mjs';
 import {fieldnotes,habitatLore,friendship,pairs,recommendFriend} from './fieldnotes.mjs';
@@ -8,6 +9,12 @@ import { publicURL, shareText } from './share.mjs';
 import { initialState, habitatNames, habitatOf, openHabitat, MODES, selectEgg, confirmReady, earn, earnInterval, setPartner, recordCare, renamePet, parseSave, targetSeconds, dayKey } from './domain.mjs';
 import { load, persist, keyFor } from './storage.mjs';
 const REPOSITORY = 'https://github.com/dayainow/lorehatch';
+let storedLanguage;try{storedLanguage=desktop?.locale??localStorage.getItem('moamon.language');}catch{}
+setLocale(new URLSearchParams(location.search).get('lang')??storedLanguage??navigator.language);
+function updateLanguage(){document.documentElement.lang=locale;document.title=locale==='en'?'Moamon — Little friends, growing together':'모아몬 — 함께 자라는 작은 친구';document.querySelector('link[rel=manifest]')?.setAttribute('href',locale==='en'?'./manifest.en.webmanifest':'./manifest.webmanifest');}
+updateLanguage();
+try{localStorage.setItem('moamon.language',locale);}catch{}
+if(desktop?.language)desktop.language(locale);
 const canWrite = () => lockOwned && !saveBlocked;
 const $ = s=>document.querySelector(s);
 const mode = new URLSearchParams(location.search).get('mode') === 'demo' ? 'demo':'normal';
@@ -17,14 +24,15 @@ let modalReturnFocus=null,updateReady=false;
 let page='garden', selectedPet=null, stagePreview='baby', notice=loaded.warning||desktop?.warning, toastTimer, reactionTimer;
 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const name=id=>state.pets.find(p=>p.id===id)?.nickname || content[id]?.name || '';
-const time=s=>`${String(Math.floor(Math.max(0,s)/60)).padStart(2,'0')}:${String(Math.floor(Math.max(0,s)%60)).padStart(2,'0')}`;
-const duration=s=>mode==='demo'?`${Math.ceil(s)}초`:`${Math.floor(Math.max(0,s)/60)}분 ${String(Math.ceil(Math.max(0,s))%60).padStart(2,'0')}초`;
+const name=id=>{const nickname=state.pets.find(p=>p.id===id)?.nickname;return nickname?'\uE000'+nickname.replace(/[\uE000\uE001]/g,'')+'\uE001':t(content[id]?.name??'');};
+const time=s=>`${String(Math.floor(Math.ceil(Math.max(0,s))/60)).padStart(2,'0')}:${String(Math.floor(Math.max(0,s)%60)).padStart(2,'0')}`;
+const duration=s=>mode==='demo'?`${Math.ceil(s)}초`:`${Math.floor(Math.ceil(Math.max(0,s))/60)}분 ${String(Math.ceil(Math.max(0,s))%60).padStart(2,'0')}초`;
 function sprite(id,stage='baby',extra='') {
  const base=id==='egg'?'egg':`${id}-${stage}`;
  return `<span class="sprite ${extra}" aria-hidden="true"><img src="./assets/sprites/${base}-0.svg" alt=""><img src="./assets/sprites/${base}-1.svg" alt=""></span>`;
 }
-function notify(message) { const t=$('#toast'); if(!t)return; t.textContent=message;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),4000); }
+const translateMessage=message=>t(message);
+function notify(message) { const t=$('#toast'); if(!t)return; t.textContent=translateMessage(message);t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),4000); }
 function save() {
  if (!canWrite())return;
  try { persist(storage,state); } catch { saveBlocked=true;notice='저장 공간에 기록하지 못했어요. 설정에서 진행 파일을 내보내 보관하세요.'; running=false; render(); }
@@ -32,7 +40,7 @@ function save() {
 function commit(next) {state=next;save();render();}
 function pause(message) { running=false;lastTick=0;save();render();if(message)notify(message); }
 function header() {
- return `<header class="header"><a class="brand" href="${mode==='demo'?'./?mode=demo':'./'}" aria-label="모아몬 홈"><span class="brand-mark">${sprite('egg')}</span><span>모아몬<small>MOAMON</small></span></a><nav aria-label="주 메뉴">${[['garden','정원'],['collection','도감'],['pets','내 펫'],['journal','추억']].map(([id,label])=>`<button data-page="${id}" class="nav-button ${page===id?'active':''}" ${page===id?'aria-current="page"':''}>${label}${id==='collection'?`<span>${state.pets.length}/${Object.keys(content).length}</span>`:''}</button>`).join('')}</nav><button class="icon-button" data-action="settings" aria-label="설정 열기">${icon('settings')}</button></header>`;
+ return `<header class="header"><a class="brand" href="${'./?lang='+locale+(mode==='demo'?'&mode=demo':'')}" aria-label="모아몬 홈"><span class="brand-mark">${sprite('egg')}</span><span>모아몬<small>${locale==='en'?'LITTLE COMPANIONS':'작은 친구들'}</small></span></a><nav aria-label="주 메뉴">${[['garden','정원'],['collection','도감'],['pets','내 펫'],['journal','추억']].map(([id,label])=>`<button data-page="${id}" class="nav-button ${page===id?'active':''}" ${page===id?'aria-current="page"':''}>${label}${id==='collection'?`<span>${state.pets.length}/${Object.keys(content).length}</span>`:''}</button>`).join('')}</nav><button class="language-toggle" data-action="language" aria-label="${locale==='en'?'한국어로 전환':'Switch to English'}" translate="no">${locale==='en'?'한국어':'English'}</button><button class="icon-button" data-action="settings" aria-label="설정 열기">${icon('settings')}</button></header>`;
 }
 function icon(type){return type==='settings'?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 3-1 3-3 1-2 4 2 2 1 4 3 1 2 3 4-2 3-1 1-4 2-3-2-3-3-1-1-3Z"/><circle cx="12" cy="12" r="3"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>';}
 function scene() {
@@ -109,7 +117,7 @@ function guideControls(count){
 }
 function collectionPage(petsOnly=false) {
  const ids=petsOnly?state.pets.map(p=>p.id):Object.keys(content).filter(id=>habitatOf(id)===guideHabitat&&(guideElement==='전체'||elements[id]===guideElement)&&(!guideMissing||!state.pets.some(p=>p.id===id)));
- return `<main id="main-content" tabindex="-1" class="collection-page"><div class="page-title"><div><span class="eyebrow">${petsOnly?'OUR LITTLE FAMILY':'FIELD NOTES · VOL. 01'}</span><h1>${petsOnly?'내 펫':'모아몬 도감'}</h1><p>${petsOnly?'함께할 파트너를 골라주세요.':habitatLore[guideHabitat]}</p></div><div class="collection-count">${state.pets.length}<span> / ${Object.keys(content).length}종</span></div></div>${petsOnly?'':guideControls(ids.length)}${!petsOnly&&!ids.length?'<p>이 속성의 친구를 모두 만났어요. 미발견만 보기를 끄면 다시 볼 수 있어요.</p>':''}${petsOnly&&!ids.length?'<div class="empty-state"><p>아직 만난 친구가 없어요.</p><button class="primary" data-action="eggs">첫 알 고르기 →</button></div>':''}<div class="bestiary">${ids.map((id,i)=>{const p=state.pets.find(p=>p.id===id);return `<button class="creature-entry ${p?'owned':'locked'}" data-detail="${id}"><span class="entry-number">NO. ${String(Object.keys(content).indexOf(id)+1).padStart(2,'0')}</span><div class="specimen ${content[id].color}">${sprite(id,p?.stage||'adult',p?'':'silhouette')}<span class="specimen-ground"></span></div><div class="entry-title"><h2>${esc(p?name(id):content[id].name)}</h2><span>${p?p.stage==='adult'?'성장':'아기':'미발견'}</span></div><p>${elements[id]} 속성 · ${content[id].kind}</p><div class="entry-footer">${p?`${state.partner===id?'● 파트너 · ':''}${new Date(p.hatchedAt).toLocaleDateString('ko-KR')} 만남`:content[id].description}<span>↗</span></div></button>`}).join('')}</div>${petsOnly?'':relationships()}<p class="collection-note">서식지마다 여섯 친구가 살아요. 아기와 성장한 모습은 같은 친구예요. 친구 이야기 ${pairs.filter(([id])=>friendship(id,state.pets).complete).length} / ${pairs.length}개를 발견했어요.</p></main>`;
+ return `<main id="main-content" tabindex="-1" class="collection-page"><div class="page-title"><div><span class="eyebrow">${petsOnly?'OUR LITTLE FAMILY':'FIELD NOTES · VOL. 01'}</span><h1>${petsOnly?'내 펫':'모아몬 도감'}</h1><p>${petsOnly?'함께할 파트너를 골라주세요.':habitatLore[guideHabitat]}</p></div><div class="collection-count">${state.pets.length}<span> / ${Object.keys(content).length}종</span></div></div>${petsOnly?'':guideControls(ids.length)}${!petsOnly&&!ids.length?'<p>이 속성의 친구를 모두 만났어요. 미발견만 보기를 끄면 다시 볼 수 있어요.</p>':''}${petsOnly&&!ids.length?'<div class="empty-state"><p>아직 만난 친구가 없어요.</p><button class="primary" data-action="eggs">첫 알 고르기 →</button></div>':''}<div class="bestiary">${ids.map((id,i)=>{const p=state.pets.find(p=>p.id===id);return `<button class="creature-entry ${p?'owned':'locked'}" data-detail="${id}"><span class="entry-number">NO. ${String(Object.keys(content).indexOf(id)+1).padStart(2,'0')}</span><div class="specimen ${content[id].color}">${sprite(id,p?.stage||'adult',p?'':'silhouette')}<span class="specimen-ground"></span></div><div class="entry-title"><h2>${esc(p?name(id):content[id].name)}</h2><span>${p?p.stage==='adult'?'성장':'아기':'미발견'}</span></div><p>${elements[id]} 속성 · ${content[id].kind}</p><div class="entry-footer">${p?`${state.partner===id?'● 파트너 · ':''}${new Date(p.hatchedAt).toLocaleDateString(locale==='ko'?'ko-KR':'en-US')} 만남`:content[id].description}<span>↗</span></div></button>`}).join('')}</div>${petsOnly?'':relationships()}<p class="collection-note">서식지마다 여섯 친구가 살아요. 아기와 성장한 모습은 같은 친구예요. 친구 이야기 ${pairs.filter(([id])=>friendship(id,state.pets).complete).length} / ${pairs.length}개를 발견했어요.</p></main>`;
 }
 function menuCare(){
  const ready=state.phase.endsWith('ready');
@@ -127,7 +135,7 @@ function updateMenu(){
  const still=state.settings.reducedMotion || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  const signature=JSON.stringify([line,label,spriteKey,still]);
  if(previousMenu===signature)return;
- desktop.menu(line,label,spriteKey,still);previousMenu=signature;
+ desktop.menu(t(line),t(label),spriteKey,still);previousMenu=signature;
 }
 window.addEventListener('moamon-activity',event=>{
  if(!canWrite())return;
@@ -150,14 +158,15 @@ function render(){
  const open=$('dialog[open]'); if(open) return;
  const focus=document.activeElement?.dataset;const restore=focus?.action || null;
  document.body.classList.toggle('reduce-motion',state.settings.reducedMotion);
- $('#app').innerHTML=`${header()}${updateReady?'<div class="update-banner" role="status"><span>새 버전이 준비됐어요. 현재 진행을 저장하고 업데이트할 수 있어요.</span><button data-action="update">업데이트</button></div>':''}${mode==='demo'?'<div class="mode-banner"><span>빠른 체험 중 · 일반 정원과 별도로 저장돼요</span><button data-action="normal">일반 정원으로 →</button></div>':''}${!lockOwned&&lockResolved?'<div class="warning" role="status">다른 탭에서 이 정원을 열고 있어요. 이 탭은 둘러보기만 할 수 있습니다. 다른 탭을 닫은 후 새로고침해 주세요.</div>':''}${notice?`<div class="warning" role="status">${esc(notice)}</div>`:''}${page==='garden'?gardenPage():page==='journal'?journalPage():collectionPage(page==='pets')}<section class="community"><span>작은 정원이 마음에 드셨나요?</span><div><button data-action="share">정원 공유하기 ↗</button><a href="${REPOSITORY}" target="_blank" rel="noopener noreferrer">☆ GitHub에서 Star</a><button data-action="help">이용 안내</button>${!installed()?'<button data-action="install">앱 설치</button>':''}</div></section><footer><span>MOAMON <span class="footer-dot">·</span> 작은 동료와 함께하는 시간</span><span>${desktop?"MAC APP":"WEB APP"} 0.6.0</span></footer><div id="toast" role="status" aria-live="polite"></div><dialog id="modal" aria-labelledby="modal-title"></dialog>`;
+ $('#app').innerHTML=`${header()}${updateReady?'<div class="update-banner" role="status"><span>새 버전이 준비됐어요. 현재 진행을 저장하고 업데이트할 수 있어요.</span><button data-action="update">업데이트</button></div>':''}${mode==='demo'?'<div class="mode-banner"><span>빠른 체험 중 · 일반 정원과 별도로 저장돼요</span><button data-action="normal">일반 정원으로 →</button></div>':''}${!lockOwned&&lockResolved?'<div class="warning" role="status">다른 탭에서 이 정원을 열고 있어요. 이 탭은 둘러보기만 할 수 있습니다. 다른 탭을 닫은 후 새로고침해 주세요.</div>':''}${notice?`<div class="warning" role="status">${esc(notice)}</div>`:''}${page==='garden'?gardenPage():page==='journal'?journalPage():collectionPage(page==='pets')}<section class="community"><span>작은 정원이 마음에 드셨나요?</span><div><button data-action="share">정원 공유하기 ↗</button><a href="${REPOSITORY}" target="_blank" rel="noopener noreferrer">☆ GitHub에서 Star</a><button data-action="help">이용 안내</button>${!installed()?'<button data-action="install">앱 설치</button>':''}</div></section><footer><span>MOAMON <span class="footer-dot">·</span> 작은 동료와 함께하는 시간</span><span>${desktop?"MAC APP":"WEB APP"} 0.7.0</span></footer><div id="toast" role="status" aria-live="polite"></div><dialog id="modal" aria-labelledby="modal-title"></dialog>`;
+ localize($('#app'));document.querySelector('.skip-link').textContent=locale==='en'?'Skip to content':'본문으로 건너뛰기';
  if(!canWrite())document.querySelectorAll('[data-action="toggle"],[data-action="confirm"],[data-action="eggs"]').forEach(el=>el.disabled=true);
  if(restore)document.querySelector(`[data-action="${restore}"]`)?.focus({preventScroll:true});
 }
 function openModal(html,kind){const modal=$('#modal');
  const el=document.activeElement;
  if(!modal.contains(el)){for(const key of ['action','page','detail'])if(el?.dataset?.[key]){modalReturnFocus='[data-'+key+'="'+CSS.escape(el.dataset[key])+'"]';break;}}
-modal.innerHTML=`<button class="close-modal" data-action="close" aria-label="닫기">×</button>${html}`;modal.dataset.kind=kind;modal.showModal();}
+modal.innerHTML=`<button class="close-modal" data-action="close" aria-label="닫기">×</button>${html}`;modal.dataset.kind=kind;localize(modal);modal.showModal();}
 function eggs(){
  let available=(state.tutorialClaimed?Object.keys(content):starters).filter(id=>habitatOf(id)<=openHabitat(state)&&!state.pets.some(p=>p.id===id));
  const recommended=state.tutorialClaimed?recommendFriend(available,state.pets):null;
@@ -200,7 +209,7 @@ function carePage(pet){
 function detail(id,stage){
  const pet=state.pets.find(p=>p.id===id);selectedPet=id;stagePreview=stage||pet?.stage||'adult';
  if(!pet){openModal(`<span class="eyebrow">NOT YET DISCOVERED</span><h2 id="modal-title">${content[id].name}</h2><div class="detail-art ${content[id].color}">${sprite(id,'adult','silhouette')}</div><p>${content[id].description}</p><p><strong>${elements[id]} 속성</strong> · ${starters.includes(id)&&!state.tutorialClaimed?'첫 알에서 선택할 수 있어요.':(habitatOf(id)>openHabitat(state)?habitatNames[habitatOf(id)-1]+'의 여섯 친구를 성장시켜 주세요.':'다음 알에서 선택할 수 있어요.')}</p><button class="primary full" data-action="close">기다릴게요</button>`,'detail');return;}
- openModal(`<span class="eyebrow">NO. ${String(Object.keys(content).indexOf(id)+1).padStart(2,'0')} · ${content[id].kind}</span><h2 id="modal-title">${esc(name(id))}</h2><div class="detail-art ${content[id].color}">${sprite(id,stagePreview)}</div><div class="stage-options"><button data-stage="baby" aria-pressed="${stagePreview==='baby'}">아기</button><button data-stage="adult" aria-pressed="${stagePreview==='adult'}" ${pet.stage!=='adult'?'disabled':''}>성장 ${pet.stage!=='adult'?'🔒':''}</button></div><p>${stagePreview==='adult'?content[id].adult:content[id].description}</p>${carePage(pet)}<section class="pet-profile" aria-label="펫 정보"><h3>정보</h3><p><strong>속성</strong> ${elements[id]} · ${affinity[elements[id]]}에 강해요</p><p><strong>성격</strong> ${esc(profiles[id].personality)}</p><p><strong>좋아하는 것</strong> ${profiles[id].likes.map(esc).join(" · ")}</p><p><strong>작은 반응</strong> ${esc(profiles[id].reaction)}</p></section><details><summary>이야기</summary><h3>우리의 설정</h3><p>${esc(profiles[id].adaptation)}</p><h3>전승과 출처</h3><p>${esc(profiles[id].tradition)}</p>${sourceLinks[id]?`<a class="source-link" href="${sourceLinks[id].url}" target="_blank" rel="noopener noreferrer">${sourceLinks[id].id} · ${sourceLinks[id].title} ↗</a>`:""}<small>캐릭터 이름과 디자인은 창작안이며 전승 자체와 구분해요.</small></details><section class="pet-record" aria-label="함께한 기록"><h3>함께한 기록</h3><p>만난 날 <time datetime="${esc(pet.hatchedAt)}">${new Date(pet.hatchedAt).toLocaleDateString("ko-KR")}</time></p>${pet.grownAt?`<p>성장한 날 <time datetime="${esc(pet.grownAt)}">${new Date(pet.grownAt).toLocaleDateString("ko-KR")}</time></p>`:"<p>아직 함께 자라는 중이에요.</p>"}</section><form id="rename-form"><label for="nickname">별명 <span>선택 · 최대 20자</span></label><div class="rename-row"><input id="nickname" name="nickname" maxlength="20" value="${esc(pet.nickname)}" placeholder="${content[id].name}" ${!canWrite()?'disabled':''}><button class="secondary" ${!canWrite()?'disabled':''}>저장</button></div></form><button class="primary full" data-partner="${id}" ${!canWrite()||state.partner===id?'disabled':''}>${state.partner===id?'지금 함께하는 파트너':'파트너로 선택'}</button>`,'detail');
+ openModal(`<span class="eyebrow">NO. ${String(Object.keys(content).indexOf(id)+1).padStart(2,'0')} · ${content[id].kind}</span><h2 id="modal-title">${esc(name(id))}</h2><div class="detail-art ${content[id].color}">${sprite(id,stagePreview)}</div><div class="stage-options"><button data-stage="baby" aria-pressed="${stagePreview==='baby'}">아기</button><button data-stage="adult" aria-pressed="${stagePreview==='adult'}" ${pet.stage!=='adult'?'disabled':''}>성장 ${pet.stage!=='adult'?'🔒':''}</button></div><p>${stagePreview==='adult'?content[id].adult:content[id].description}</p>${carePage(pet)}<section class="pet-profile" aria-label="펫 정보"><h3>정보</h3><p><strong>속성</strong> ${elements[id]} · ${affinity[elements[id]]}에 강해요</p><p><strong>성격</strong> ${esc(profiles[id].personality)}</p><p><strong>좋아하는 것</strong> ${profiles[id].likes.map(esc).join(" · ")}</p><p><strong>작은 반응</strong> ${esc(profiles[id].reaction)}</p></section><details><summary>이야기</summary><h3>우리의 설정</h3><p>${esc(profiles[id].adaptation)}</p><h3>전승과 출처</h3><p>${esc(profiles[id].tradition)}</p>${sourceLinks[id]?`<a class="source-link" href="${sourceLinks[id].url}" target="_blank" rel="noopener noreferrer">${sourceLinks[id].id} · ${sourceLinks[id].title} ↗</a>`:""}<small>캐릭터 이름과 디자인은 창작안이며 전승 자체와 구분해요.</small></details><section class="pet-record" aria-label="함께한 기록"><h3>함께한 기록</h3><p>만난 날 <time datetime="${esc(pet.hatchedAt)}">${new Date(pet.hatchedAt).toLocaleDateString(locale==='ko'?'ko-KR':'en-US')}</time></p>${pet.grownAt?`<p>성장한 날 <time datetime="${esc(pet.grownAt)}">${new Date(pet.grownAt).toLocaleDateString(locale==='ko'?'ko-KR':'en-US')}</time></p>`:"<p>아직 함께 자라는 중이에요.</p>"}</section><form id="rename-form"><label for="nickname">별명 <span>선택 · 최대 20자</span></label><div class="rename-row"><input id="nickname" name="nickname" maxlength="20" value="${esc(pet.nickname)}" placeholder="${content[id].name}" ${!canWrite()?'disabled':''}><button class="secondary" ${!canWrite()?'disabled':''}>저장</button></div></form><button class="primary full" data-partner="${id}" ${!canWrite()||state.partner===id?'disabled':''}>${state.partner===id?'지금 함께하는 파트너':'파트너로 선택'}</button>`,'detail');
 }
 function activitySettings(){
  if(!desktop||mode!=='normal')return '';
@@ -219,33 +228,33 @@ function share(){
  pause();openModal(`<span class="eyebrow">A LITTLE GARDEN TO SHARE</span><h2 id="modal-title">작은 정원을 나눠보세요</h2><div class="share-preview">${state.pets.length?state.pets.map(p=>sprite(p.id,p.stage)).join(''):sprite('egg')}<strong>내 펫 도감</strong><span>${state.pets.length} / ${Object.keys(content).length}종 · ${state.pets.filter(p=>p.stage==='adult').length}종 성장</span></div><p>카드에는 모은 펫과 성장 수만 담아요. 별명과 함께한 시간은 포함하지 않아요.</p><div class="button-row"><button class="primary" data-action="share-image">카드 이미지 저장</button><button class="secondary" data-action="share-link">링크 공유</button></div><label class="share-label" for="share-url">공유할 주소</label><input id="share-url" class="share-url" readonly value="${esc(publicURL(desktop?SITE:location.href))}"><p class="modal-note">다른 사람은 자신의 새 정원에서 시작해요.</p>`,'share');
 }
 async function shareLink(){
- const data={title:'모아몬',text:shareText(desktop?SITE:location.href),url:publicURL(desktop?SITE:location.href)};
+ const data={title:t('모아몬'),text:shareText(desktop?SITE:location.href,locale),url:publicURL(desktop?SITE:location.href)};
  try {if(navigator.share)await navigator.share(data);else if(navigator.clipboard){await navigator.clipboard.writeText(data.text);notify('공유 문구와 주소를 복사했어요.');}else{$('#share-url')?.select();notify('주소를 선택했어요. 복사해서 공유해 주세요.');}}
  catch(err){if(err.name!=='AbortError'){$('#share-url')?.select();notify('공유 주소를 직접 복사해 주세요.');}}
 }
 async function shareImage(){
  const canvas=document.createElement('canvas');canvas.width=960;canvas.height=600;const ctx=canvas.getContext('2d');
  ctx.fillStyle='#f4f1e8';ctx.fillRect(0,0,960,600);ctx.fillStyle='#163c39';ctx.fillRect(32,32,896,440);
- ctx.fillStyle='#e5ead0';ctx.font='18px sans-serif';ctx.fillText('MOAMON · MY LITTLE GARDEN',72,88);
- ctx.font='bold 46px sans-serif';ctx.fillText('내 펫 도감',72,160);
+ ctx.fillStyle='#e5ead0';ctx.font='18px sans-serif';ctx.fillText(locale==='en'?'MOAMON · MY LITTLE GARDEN':'모아몬 · 나의 작은 정원',72,88);
+ ctx.font='bold 46px sans-serif';ctx.fillText(t('내 펫 도감'),72,160);
  const pets=state.pets.map(p=>({...p}));const ids=pets.length?pets:[{id:'egg'}];
  const images=await Promise.all(ids.map(p=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=new URL(`../assets/sprites/${p.id==='egg'?'egg':p.id+'-'+p.stage}-0.svg`,import.meta.url).href;})));
  const tile=Math.min(224,Math.floor(864/images.length));ctx.imageSmoothingEnabled=false;images.forEach((img,i)=>ctx.drawImage(img,480-images.length*tile/2+i*tile,430-tile,tile,tile));
- ctx.fillStyle='#315a42';ctx.font='bold 26px sans-serif';ctx.fillText(`${pets.length} / ${Object.keys(content).length}종 · ${pets.filter(p=>p.stage==='adult').length}종 성장`,64,528);
- ctx.font='18px sans-serif';ctx.fillText('알에서 시작하는 작은 만남. 함께 키워보세요.',64,567);
+ ctx.fillStyle='#315a42';ctx.font='bold 26px sans-serif';ctx.fillText(t(`${pets.length} / ${Object.keys(content).length}종 · ${pets.filter(p=>p.stage==='adult').length}종 성장`),64,528);
+ ctx.font='18px sans-serif';ctx.fillText(t('알에서 시작하는 작은 만남. 함께 키워보세요.'),64,567);
  canvas.toBlob(blob=>{if(!blob){notify('이미지를 만들지 못했어요.');return;}downloadFile(blob,'lorehatch-garden.png').catch(()=>notify('이미지를 저장하지 못했어요.'));},'image/png');
 }
 function showInstall(){
  pause();openModal(`<span class="eyebrow">어디서든 나의 작은 정원</span><h2 id="modal-title">모아몬 설치하기</h2><p>원하는 방식으로 정원을 가까이 두세요. 웹과 데스크톱 앱의 진행은 파일로 옮길 수 있어요.</p><section class="setting-section"><h3>macOS 앱 다운로드</h3><p>Mac용 앱은 배포 준비 중이에요. 공개된 설치 파일이 있는지 릴리스 목록에서 확인해 주세요.</p><a class="primary" href="${REPOSITORY}/releases" target="_blank" rel="noopener noreferrer">공개 릴리스 확인 ↗</a><p class="hint">개발자 서명·공증 전의 알파 버전입니다. macOS가 실행을 제한하면 아래 안내를 확인하세요.</p></section><section class="setting-section"><h3>브라우저 앱으로 설치</h3>${installationAvailable()?'<button class="primary full" data-action="install-now">이 기기에 앱 설치</button>':''}<p>Chrome·Edge: 주소창의 설치 아이콘 또는 메뉴의 ‘앱 설치’<br>Mac Safari: 파일 → Dock에 추가<br>iPhone·iPad Safari: 공유 → 홈 화면에 추가</p><p>설치 메뉴의 이름과 지원 여부는 브라우저에 따라 달라요. 한 번 온라인으로 연 뒤 앱 화면을 오프라인에서도 다시 열 수 있어요.</p></section><section class="setting-section"><h3>기존 펫 옮기기</h3><p>지금 정원의 설정에서 ‘파일 내보내기’를 누른 뒤, 새 앱의 같은 모드에서 ‘파일 가져오기’를 선택하세요. 브라우저와 앱 저장은 자동으로 합쳐지지 않아요.</p><a class="source-link" href="${REPOSITORY}/blob/main/docs/17-install.md" target="_blank" rel="noopener noreferrer">설치·업데이트·복구 안내 ↗</a></section>`,'install');
 }
 function closeModal(){const modal=$('#modal');modal.close();render();if(modalReturnFocus)document.querySelector(modalReturnFocus)?.focus({preventScroll:true});}
-function switchMode(next){pause();location.href=next==='demo'?'./?mode=demo':'./';}
+function switchMode(next){pause();location.href='./?lang='+locale+(next==='demo'?'&mode=demo':'');}
 const mutations=new Set(['confirm','toggle','start-after-hatch','reset']);
 document.addEventListener('click',event=>{
  const b=event.target.closest('button');if(!b||b.disabled)return;
  if(b.dataset.encounter){encounterPage(b.dataset.encounter);return;}
  if(b.dataset.memoryId){if(!canWrite())return;const id=b.dataset.memoryId,next=rememberEncounter(state,id,Number(b.dataset.choice));if(next!==state){commit(next);if(!saveBlocked){desktop?.react?.();encounterPage(id);}}else encounterPage(id,true);return;}
- if(b.dataset.companion){const status=desktop.companion(b.dataset.companion);$('#companion-status').textContent=`${status.visible?'표시 중':'숨겨짐'} · ${status.size===144?'크게':'작게'}`;return;}
+ if(b.dataset.companion){const status=desktop.companion(b.dataset.companion);$('#companion-status').textContent=t(`${status.visible?'표시 중':'숨겨짐'} · ${status.size===144?'크게':'작게'}`);return;}
  if(b.dataset.habitat!==undefined){guideHabitat=Number(b.dataset.habitat);render();document.querySelector('[data-habitat="'+guideHabitat+'"]')?.focus();return;}
  if(b.dataset.element || b.hasAttribute('data-guide-missing')){
   if(b.dataset.element)guideElement=b.dataset.element;else guideMissing=!guideMissing;
@@ -263,7 +272,9 @@ document.addEventListener('click',event=>{
  if(b.dataset.stage){$('#modal').close();detail(selectedPet,b.dataset.stage);return;}
  if(b.dataset.partner){if(!canWrite())return;state=setPartner(state,b.dataset.partner);closeModal();save();render();notify('파트너로 선택했어요.');return;}
  if(b.dataset.duration!==undefined){if(running)return;sessionLimit=Number(b.dataset.duration)*60;sessionElapsed=0;render();return;}
- const action=b.dataset.action;if(mutations.has(action)&&(!lockOwned||(saveBlocked&&action!=='reset')))return;
+ const action=b.dataset.action;
+ if(action==='language'){pause();setLocale(locale==='en'?'ko':'en');try{localStorage.setItem('moamon.language',locale);}catch{}desktop?.language?.(locale);const url=new URL(location.href);url.searchParams.set('lang',locale);history.replaceState(null,'',url);updateLanguage();previousMenu='';render();return;}
+ if(mutations.has(action)&&(!lockOwned||(saveBlocked&&action!=='reset')))return;
  if(action==='open-journal'){closeModal();page='journal';render();window.scrollTo(0,0);$('#main-content')?.focus({preventScroll:true});return;}
  if(action==='close')closeModal();
  if(action==='eggs')eggs();
@@ -295,7 +306,7 @@ document.addEventListener('click',event=>{
  }
  if(action==='import')$('#import-file').click();
  if(action==='reset'){
-  if(!confirm(`${mode==='demo'?'체험':'현재 정원'}의 펫과 진행을 모두 지울까요? 되돌리려면 내보낸 파일이 필요해요.`))return;
+  if(!confirm(t(`${mode==='demo'?'체험':'현재 정원'}의 펫과 진행을 모두 지울까요? 되돌리려면 내보낸 파일이 필요해요.`)))return;
   try {storage.removeItem(keyFor(mode));storage.removeItem(keyFor(mode)+'.backup');} catch {notify('저장소에 접근할 수 없어 초기화하지 못했어요.');return;}
   state=initialState(mode);saveBlocked=false;notice='';sessionElapsed=0;closeModal();save();render();notify('새 정원을 준비했어요.');
  }
@@ -314,9 +325,9 @@ document.addEventListener('change',async e=>{
   try {
    if(file.size>100000)throw Error('100KB 이하의 저장 파일을 선택해 주세요.');
    const imported=parseSave(await file.text(),mode);
-   if(!confirm('현재 진행을 이 파일로 바꿀까요? 지금 진행은 먼저 내보내 보관할 수 있어요.')){e.target.value='';return;}
+   if(!confirm(t('현재 진행을 이 파일로 바꿀까요? 지금 진행은 먼저 내보내 보관할 수 있어요.'))){e.target.value='';return;}
    persist(storage,imported);state=imported;saveBlocked=false;notice='';sessionElapsed=0;closeModal();render();notify('진행 파일을 불러왔어요.');
-  } catch(err){$('#import-status').textContent=`가져오지 못했어요: ${err.message} 기존 진행은 그대로예요.`;e.target.value='';}
+  } catch(err){$('#import-status').textContent=t(`가져오지 못했어요: ${err.message} 기존 진행은 그대로예요.`);e.target.value='';}
  }
 });
 document.addEventListener('cancel',e=>{if(e.target.id==='modal'){e.preventDefault();closeModal();}},true);
@@ -337,9 +348,9 @@ setInterval(()=>{
  if(prev!==state.phase){running=false;render();notify('새로운 모습이 기다려요. 준비되면 확인해 주세요.');return;}
  if((sessionLimit&&sessionElapsed>=sessionLimit)||state.daily>=MODES[mode].cap){pause(state.daily>=MODES[mode].cap?'오늘의 적립을 모두 채웠어요.':'함께한 시간이 끝났어요. 수고했어요.');return;}
  if($('#session-clock'))$('#session-clock').textContent=time(sessionElapsed);
- if($('#remaining')&&state.active)$('#remaining').textContent=duration(targetSeconds(state)-state.active.progress);
+ if($('#remaining')&&state.active)$('#remaining').textContent=t(duration(targetSeconds(state)-state.active.progress));
  if($('progress')&&state.active)$('progress').value=state.active.progress/targetSeconds(state)*100;
- if($('#daily'))$('#daily').innerHTML=`${Math.floor(state.daily/60)}<small> / 150분</small>`;
+ if($('#daily'))$('#daily').innerHTML=`${Math.floor(state.daily/60)}<small> / ${locale==='ko'?'150분':'150m'}</small>`;
  if($('#daily-bar'))$('#daily-bar').style.width=`${state.daily/MODES[mode].cap*100}%`;
 },250);
 render();

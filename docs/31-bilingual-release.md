@@ -30,4 +30,11 @@
 
 현재 수동 성장은 화면이 보이고 세션이 실행 중일 때만 쌓인다. 첫 부화는 즉시, 이후 부화는 5분, 성장은 15분이다. 이 제한은 두 README와 게임 안내에 공개한다.
 
-빌드 성공은 배포 성공을 뜻하지 않는다. 공개 URL과 GitHub 릴리스는 게시 후 별도로 확인한다.
+## 공개 결과
+
+- 출시 커밋: `0c30729`.
+- [GitHub Pages 배포 실행](https://github.com/dayainow/lorehatch/actions/runs/43012963010): 빌드·배포 모두 성공.
+- [공개 한국어 화면](https://dayainow.github.io/lorehatch/?lang=ko)과 [영어 화면](https://dayainow.github.io/lorehatch/?lang=en): 실제 브라우저에서 0.7.0 표시 및 언어 전환 확인.
+- [0.7.0 알파 배포](https://github.com/dayainow/lorehatch/releases/tag/v0.7.0-alpha.1): 웹 ZIP과 SHA-256 파일 업로드 완료. 맥 설치판은 첨부하지 않았다.
+
+빌드·배포와 공개 화면 확인을 구분해 완료했다. 앱스토어 등록이나 일반 맥 출시를 완료했다는 의미는 아니다.

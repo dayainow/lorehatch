@@ -6,15 +6,17 @@
 
 **A little friend grows while you work.**
 
-Choose an egg. Meet your companion. Build a garden of small, shared stories.
+Hatch a pet. Work together. Discover three forms and a garden of little stories.
 
 [**Play in English ↗**](https://dayainow.github.io/lorehatch/?lang=en) · [**30-second demo**](https://dayainow.github.io/lorehatch/?lang=en&mode=demo) · [**Star on GitHub ☆**](https://github.com/dayainow/lorehatch)
 
-**Web alpha · 30 species · English & Korean · Local saves**
+**30 species · 3 forms each · Desktop pet · English & Korean**
 
 </div>
 
-![The English Moamon garden with Coco, the ember puppy](docs/screenshots/v07-garden-en.jpg)
+> This README describes the current source and local Mac build. The hosted web alpha may be an earlier version; pushing source does not publish it automatically.
+
+![Earlier English web-alpha garden](docs/screenshots/v07-garden-en.jpg)
 
 ## Your next break has a tiny face
 
@@ -22,7 +24,15 @@ Saebom unfolds its leaf wings in the sun. Naru practices a careful landing. Coco
 
 Your first egg hatches immediately. Choose **Work together** and keep the garden visible: your pet is ready to evolve in **15 minutes**. Later eggs hatch in **5 minutes**. There is no hunger meter, lost streak, or penalty for taking a day off.
 
-**Choose an egg → hatch → work together → evolve → discover a friendship.**
+**Egg → baby → first evolution → final form.**
+
+Your first evolution takes **15 minutes** together. In **My pets**, choose **Raise the final form**, then work together for another **30 minutes**. Existing evolved pets can continue from their current form. The demo uses **30 seconds + 60 seconds** after hatching.
+
+## A pet with a little personality
+
+Your garden pet breathes, looks around, and gets sleepy while idle. During focus it gives a quiet nod. Click it for a hop, a nuzzle, or a happy wiggle. The desktop pet reacts while keeping its click-to-focus controls.
+
+All 30 species and all three forms share these body motions. Motion reduction is supported. Individual tail, wing, and paw animations are still planned.
 
 ## Thirty friends. Five places to call home.
 
@@ -41,9 +51,9 @@ The longer-term ambition is 120 species. **This alpha contains 30**, each with t
 1. [Open the English garden](https://dayainow.github.io/lorehatch/?lang=en) and choose a fire, water, or grass egg.
 2. Hatch your friend, then choose **Work together**. **No limit** keeps the session going until you pause or evolution is ready.
 3. Open the field guide to discover its care reaction. Visit Memories for its little request.
-4. Select **Evolve** to see both forms side by side. You can revisit them in **My pets** and the field guide.
+4. Select **Evolve** to compare all three forms. You can revisit them in **My pets** and the field guide.
 
-The [quick demo](https://dayainow.github.io/lorehatch/?lang=en&mode=demo) uses a separate save, with 15-second hatching and 30-second evolution. Regular growth is capped at 150 credited minutes per day.
+The [quick demo](https://dayainow.github.io/lorehatch/?lang=en&mode=demo) uses a separate save, with 15-second hatching and 30-second first evolution and 60-second final evolution. Regular growth is capped at 150 credited minutes per day.
 
 **On a phone**, use the bottom controls to hatch, care, or start and pause growth, even while looking through the field guide. Supported mobile browsers keep the screen awake during an active session.
 
@@ -103,9 +113,11 @@ The local Mac build also includes an **experimental Claude Code completion hook*
 
 ## Alpha status
 
+The latest local verification passed **46 tests**, checked idle/focus rendering and desktop sprite selection for all **90 forms**, and loaded all **182 frames** through the native pixel parser. Universal Mac packaging, signature integrity, and save/recovery self-tests passed. These are development builds; individual motion playback has not been visually tested for every form.
+
 The automated checks cover growth, save recovery and migration, collection completion, care, memories, offline navigation, and translation coverage. Browser checks cover English hatching, care, memory collection, language switching, and field-guide browsing. These checks do not establish customer validation or full device coverage.
 
-Before a general Mac release, Developer ID signing, notarization, broader native playtesting, and live AI integration testing remain. Background growth is a separate product feature, not a claim of this release.
+Before a general Mac release, Developer ID signing, notarization, broader native playtesting, and live AI integration testing remain.
 
 Found a problem or a friend you would love to meet? [Open an issue](https://github.com/dayainow/lorehatch/issues) with your platform and reproduction steps. Please keep private save files out of public issues.
 
@@ -120,5 +132,3 @@ Presentation references include [VS Code Pets](https://github.com/tonybaloney/vs
 ---
 
 **One egg. One little friend. A reason to come back.**
-
-Final evolution: open an evolved pet in My pets and choose **Raise the final form**. It takes 30 credited minutes (60 seconds in the demo). Existing evolved pets remain eligible. All 30 final forms have individually composed pixel designs.

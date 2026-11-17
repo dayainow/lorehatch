@@ -50,7 +50,8 @@ function translateCore(value,lang){
  const t=s=>translateText(s,lang);
  const patterns=[
  [/^(.+)의 부화를 확인해 주세요\.$/,m=>`Ready to hatch: ${t(m[1])}.`],
- [/^(.+)의 새로운 모습을 확인해보세요\.$/,m=>`Meet ${t(m[1])} in a new grown form.`],
+ [/^(.+)의 진화 모습을 만나보세요\.$/,m=>`${t(m[1])} is ready to evolve.`],
+ [/^(.+)의 진화!$/,m=>`${t(m[1])} evolved!`],
  [/^(.+)의 알을 품고 있어요\.$/,m=>`Keeping ${t(m[1])}’s egg warm.`],
  [/^(.+)의 성장 시간이 쌓이고 있어요\.$/,m=>`${t(m[1])} is growing with you.`],
  [/^(.+)의 (첫 반응|달라진 반응)을 발견해 보세요\.$/,m=>`Discover ${t(m[1])}’s ${m[2]==='첫 반응'?'first':'new'} care response.`],

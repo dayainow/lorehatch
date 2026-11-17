@@ -6,7 +6,7 @@ import { desktop, storage, downloadFile, SITE } from './platform.mjs';
 import { installed, installationAvailable, installApp, registerApp, applyUpdate } from './install.mjs';
 import { content, profiles, sourceLinks, starters, elements, affinity } from './content.mjs';
 import { publicURL, shareText } from './share.mjs';
-import { initialState, habitatNames, habitatOf, openHabitat, MODES, selectEgg, confirmReady, earn, earnInterval, setPartner, recordCare, renamePet, parseSave, targetSeconds, dayKey } from './domain.mjs';
+import { beginFinal, initialState, habitatNames, habitatOf, openHabitat, MODES, selectEgg, confirmReady, earn, earnInterval, setPartner, recordCare, renamePet, parseSave, targetSeconds, dayKey } from './domain.mjs';
 import { load, persist, keyFor } from './storage.mjs';
 const REPOSITORY = 'https://github.com/dayainow/lorehatch';
 let storedLanguage;try{storedLanguage=desktop?.locale??localStorage.getItem('moamon.language');}catch{}
@@ -19,8 +19,9 @@ const canWrite = () => lockOwned && !saveBlocked;
 const $ = s=>document.querySelector(s);
 const mode = new URLSearchParams(location.search).get('mode') === 'demo' ? 'demo':'normal';
 const loaded=load(storage,mode); let state=loaded.state, saveBlocked=!!loaded.blocked||!!desktop?.blocked;
-let lockOwned=false, lockResolved=false, running=false, lastTick=0, lastWall=0, sessionElapsed=0, sessionLimit=0, checkpoint=0;
+let lockOwned=false, lockResolved=false, running=false, petFocus=false, lastTick=0, lastWall=0, sessionElapsed=0, sessionLimit=0, checkpoint=0;
 let modalReturnFocus=null,updateReady=false;
+let affectionIndex=0;
 let page='garden', selectedPet=null, stagePreview='baby', notice=loaded.warning||desktop?.warning, toastTimer, reactionTimer;
 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -35,10 +36,26 @@ const translateMessage=message=>t(message);
 function notify(message) { const t=$('#toast'); if(!t)return; t.textContent=translateMessage(message);t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),4000); }
 function save() {
  if (!canWrite())return;
- try { persist(storage,state); } catch { saveBlocked=true;notice='저장 공간에 기록하지 못했어요. 설정에서 진행 파일을 내보내 보관하세요.'; running=false; render(); }
+ try { persist(storage,state); } catch { saveBlocked=true;petFocus=false;notice='저장 공간에 기록하지 못했어요. 설정에서 진행 파일을 내보내 보관하세요.'; running=false;releaseScreenLock();render(); }
 }
 function commit(next) {state=next;save();render();}
-function pause(message) { running=false;lastTick=0;save();render();if(message)notify(message); }
+let screenLock=null;
+let screenLockRequest=0;
+async function keepPhoneScreenOn(){
+ if(desktop||document.hidden||!navigator.wakeLock||!window.matchMedia('(max-width: 760px)').matches)return;
+ const request=++screenLockRequest;
+ try{
+  const lock=await navigator.wakeLock.request('screen');
+  if(request!==screenLockRequest||!running||document.hidden){await lock.release();return;}
+  screenLock=lock;
+ }catch{/* Some devices decline this request in low-power mode. */}
+}
+function releaseScreenLock(){
+ screenLockRequest++;
+ const lock=screenLock;screenLock=null;
+ lock?.release().catch(()=>{});
+}
+function pause(message) { running=false;petFocus=false;releaseScreenLock();lastTick=0;save();render();if(message)notify(message); }
 function header() {
  return `<header class="header"><a class="brand" href="${'./?lang='+locale+(mode==='demo'?'&mode=demo':'')}" aria-label="모아몬 홈"><span class="brand-mark">${sprite('egg')}</span><span>모아몬<small>${locale==='en'?'LITTLE COMPANIONS':'작은 친구들'}</small></span></a><nav aria-label="주 메뉴">${[['garden','정원'],['collection','도감'],['pets','내 펫'],['journal','추억']].map(([id,label])=>`<button data-page="${id}" class="nav-button ${page===id?'active':''}" ${page===id?'aria-current="page"':''}>${label}${id==='collection'?`<span>${state.pets.length}/${Object.keys(content).length}</span>`:''}</button>`).join('')}</nav><button class="language-toggle" data-action="language" aria-label="${locale==='en'?'한국어로 전환':'Switch to English'}" translate="no">${locale==='en'?'한국어':'English'}</button><button class="icon-button" data-action="settings" aria-label="설정 열기">${icon('settings')}</button></header>`;
 }
@@ -46,22 +63,22 @@ function icon(type){return type==='settings'?'<svg viewBox="0 0 24 24" fill="non
 function scene() {
  const partner=state.pets.find(p=>p.id===state.partner);
  const egg=['incubating','hatch_ready'].includes(state.phase);
- return `<section class="scene" data-region="${partner?habitatOf(partner.id):0}" aria-label="숲속 정원"><div class="scene-top"><span class="scene-label"><i></i> ${habitatNames[partner?habitatOf(partner.id):0]}</span><span class="scene-counter">${state.pets.filter(p=>p.stage==='adult').length} / ${Object.keys(content).length} 성장</span></div><div class="sunbeam"></div><div class="scene-island" aria-hidden="true"></div><div class="firefly f1"></div><div class="firefly f2"></div><div class="firefly f3"></div>
+ return `<section class="scene" data-region="${partner?habitatOf(partner.id):0}" aria-label="숲속 정원"><div class="scene-top"><span class="scene-label"><i></i> ${habitatNames[partner?habitatOf(partner.id):0]}</span><span class="scene-counter">${state.pets.filter(p=>p.stage==='adult').length} / ${Object.keys(content).length} 진화</span></div><div class="sunbeam"></div><div class="scene-island" aria-hidden="true"></div><div class="firefly f1"></div><div class="firefly f2"></div><div class="firefly f3"></div>
  <div class="garden-decor ${state.settings.decoration}" aria-hidden="true">${state.settings.decoration==='flowers'?'<i>✿</i><i>✿</i><i>✿</i>':state.settings.decoration==='mushrooms'?'<i>♠</i><i>♠</i><i>♠</i>':'<i>◆</i><i>◆</i><i>◆</i>'}</div>
- ${partner?`<button class="scene-pet ${egg?'with-egg':''}" data-action="pet" aria-label="${esc(name(partner.id))} 쓰다듬기">${sprite(partner.id,partner.stage)}<span class="pet-heart" aria-hidden="true">♥</span><span class="pet-tag">${esc(name(partner.id))}<small>파트너</small></span></button>`:''}
+ ${partner?`<button data-mood="${running?'focus':'idle'}" class="scene-pet ${egg?'with-egg':''}" data-action="pet" aria-label="${esc(name(partner.id))} 쓰다듬기">${sprite(partner.id,partner.finalForm?'final':partner.stage)}<span class="pet-heart" aria-hidden="true">♥</span><span class="pet-tag">${esc(name(partner.id))}<small>파트너</small></span></button>`:''}
  ${egg?`<div class="scene-egg ${partner?'secondary':''} ${state.phase==='hatch_ready'?'ready':''}">${sprite('egg')}<span class="pet-tag">${state.phase==='hatch_ready'?'만날 준비가 됐어요':'알을 품고 있어요'}</span></div>`:''}
  ${!partner&&!egg?`<div class="empty-nest">${sprite('egg')}<p>작은 만남이 기다리고 있어요</p></div>`:''}
  <div class="scene-bottom"><span>${running?'같이 작업하는 중':partner?'오늘도 함께, 천천히.':'당신의 첫 번째 작은 동료'}</span><button data-action="compact" class="scene-small">${document.body.classList.contains('compact')?'크게 보기':'작게 보기'} ↗</button></div></section>`;
 }
-function stageText() {return ({idle:'새로운 만남',incubating:'알을 품는 중',hatch_ready:'첫 인사를 나눠요',raising:'조금씩 자라고 있어요',growth_ready:'한 뼘 더 자랐어요',complete:'우리 정원이 완성됐어요'})[state.phase];}
+function stageText() {return ({idle:'새로운 만남',incubating:'알을 품는 중',hatch_ready:'첫 인사를 나눠요',raising:'조금씩 자라고 있어요',growth_ready:'진화할 준비가 됐어요',complete:'우리 정원이 완성됐어요'})[state.phase];}
 function focusPanel() {
  const active=state.active, ready=state.phase.endsWith('ready'), growing=state.phase==='raising', incubation=state.phase==='incubating';
  const progress=active?Math.min(100,active.progress/targetSeconds(state)*100):0;
- return `<aside class="focus-panel"><div class="eyebrow">MY LITTLE COMPANION</div><h1>${stageText()}</h1><p class="panel-description">${state.phase==='idle'?'작업하는 시간에 작은 친구를 키워보세요.':state.phase==='complete'?'모든 친구가 자랐어요. 좋아하는 파트너와 계속 함께할 수 있어요.':!running&&!ready?'아래에서 같이 작업하기를 누르면 시간이 쌓여요.':ready?`${esc(name(active.id))}${state.phase==='hatch_ready'?'의 부화를 확인해 주세요.':'의 새로운 모습을 확인해보세요.'}`:`${incubation?esc(name(active.id))+'의 알을 품고 있어요.':esc(name(active.id))+'의 성장 시간이 쌓이고 있어요.'}`}</p>
- ${active?`<div class="active-pet"><span class="portrait ${content[active.id].color}">${sprite(incubation||state.phase==='hatch_ready'?'egg':active.id)}</span><div><span class="caption">${incubation||state.phase==='hatch_ready'?'품고 있는 알':'키우는 펫'}</span><strong>${esc(name(active.id))}</strong><span class="species-label">${content[active.id].kind}</span></div></div><div class="progress-heading"><span>${ready?'준비 완료':incubation?'부화까지':'성장까지'}</span><strong id="remaining">${ready?'확인해 주세요':duration(targetSeconds(state)-active.progress)}</strong></div><progress value="${progress}" max="100" aria-label="${incubation||state.phase==='hatch_ready'?'부화':'성장'} 진행">${Math.round(progress)}%</progress>`:''}
- ${ready?`<button class="primary full" data-action="confirm">${state.phase==='hatch_ready'?'알 부화시키기':'성장한 모습 보기'} ${icon('arrow')}</button>`:''}
+ return `<aside class="focus-panel"><div class="eyebrow">MY LITTLE COMPANION</div><h1>${stageText()}</h1><p class="panel-description">${state.phase==='idle'?'작업하는 시간에 작은 친구를 키워보세요.':state.phase==='complete'?'모든 친구가 자랐어요. 좋아하는 파트너와 계속 함께할 수 있어요.':!running&&!ready?'아래에서 같이 작업하기를 누르면 시간이 쌓여요.':ready?`${esc(name(active.id))}${state.phase==='hatch_ready'?'의 부화를 확인해 주세요.':'의 진화 모습을 만나보세요.'}`:`${incubation?esc(name(active.id))+'의 알을 품고 있어요.':esc(name(active.id))+'의 성장 시간이 쌓이고 있어요.'}`}</p>
+ ${active?`<div class="active-pet"><span class="portrait ${content[active.id].color}">${sprite(incubation||state.phase==='hatch_ready'?'egg':active.id)}</span><div><span class="caption">${incubation||state.phase==='hatch_ready'?'품고 있는 알':'키우는 펫'}</span><strong>${esc(name(active.id))}</strong><span class="species-label">${content[active.id].kind}</span></div></div><div class="progress-heading"><span>${ready?'준비 완료':incubation?'부화까지':'진화까지'}</span><strong id="remaining">${ready?'확인해 주세요':duration(targetSeconds(state)-active.progress)}</strong></div><progress value="${progress}" max="100" aria-label="${incubation||state.phase==='hatch_ready'?'부화':'진화'} 진행">${Math.round(progress)}%</progress>`:''}
+ ${ready?`<button class="primary full" data-action="confirm">${state.phase==='hatch_ready'?'알 부화시키기':'진화시키기'} ${icon('arrow')}</button>`:''}
  ${['idle','complete'].includes(state.phase)?`<button class="primary full" data-action="${state.phase==='complete'?'collection':'eggs'}">${state.phase==='complete'?'완성한 도감 보기':state.tutorialClaimed?'다음 알 고르기':'첫 알 고르기'} ${icon('arrow')}</button>`:''}
- ${(growing||incubation||state.phase==='complete')?`<div class="session"><div class="session-label"><span>함께한 시간</span><span id="session-clock">${time(sessionElapsed)}</span></div><div class="duration-options" aria-label="함께한 시간 선택">${[5,15,30,0].map(n=>`<button data-duration="${n}" aria-pressed="${sessionLimit===n*60}" ${running?'disabled':''}>${n?n+'분':'계속 함께'}</button>`).join('')}</div><button class="primary full ${running?'pause':''}" data-action="toggle"><span>${running?'Ⅱ 일시정지':'▶ 같이 작업하기'}</span><span class="button-time">${mode==='demo'?'빠른 체험':sessionLimit?time(sessionLimit):'자유롭게'}</span></button><p class="hint">${mode==='demo'?'체험: 부화 15초 · 성장 30초':'이 화면이 보이는 동안만 시간이 쌓여요.'}</p></div>`:''}
+ ${(growing||incubation||state.phase==='complete')?`<div class="session"><div class="session-label"><span>함께한 시간</span><span id="session-clock">${time(sessionElapsed)}</span></div><div class="duration-options" aria-label="함께한 시간 선택">${[5,15,30,0].map(n=>`<button data-duration="${n}" aria-pressed="${sessionLimit===n*60}" ${running?'disabled':''}>${n?n+'분':'계속 함께'}</button>`).join('')}</div><button class="primary full ${running?'pause':''}" data-action="toggle"><span>${running?'Ⅱ 일시정지':'▶ 같이 작업하기'}</span><span class="button-time">${mode==='demo'?'빠른 체험':sessionLimit?time(sessionLimit):'자유롭게'}</span></button><p class="hint">${mode==='demo'?'체험: 부화 15초 · 진화 30초':petFocus?'맥에서 시작한 집중은 정원 창을 닫아도 이어져요.':desktop?.backgroundFocus?'맥에서 시작한 집중은 정원 창을 닫아도 이어져요.':'이 화면이 보이는 동안만 시간이 쌓여요.'}</p></div>`:''}
  <div class="daily"><span>오늘 함께한 시간</span><strong id="daily">${Math.floor(state.daily/60)}<small> / 150분</small></strong><div class="daily-line"><i id="daily-bar" style="width:${state.daily/MODES[mode].cap*100}%"></i></div>${state.bank>0?`<p>다음 펫에게 이어줄 시간 ${duration(state.bank)}</p>`:''}</div>
  ${desktop&&state.activity?.enabled?'<p class="activity-status"><i></i> AI 작업 신호 연결 켜짐</p>':''}<p class="quiet-note">서두르지 않아도 괜찮아요.<br>자리를 비워도 친구는 기다려요.</p></aside>`;
 }
@@ -102,7 +119,7 @@ function gardenPage(){
    <button class="cover-demo" data-action="${mode==='demo'?'normal':'demo'}">${mode==='demo'?'일반 정원 열기':'30초 성장 체험'} ↗</button><p class="trial-note">체험 정원은 일반 정원과 따로 저장돼요.</p></div>
    <div class="cover-cast" aria-label="만날 수 있는 세 친구">${starters.map(id=>[id,content[id]]).map(([id,pet])=>`<figure>${sprite(id,'baby')}<figcaption>${elements[id]} · ${pet.name}</figcaption></figure>`).join('')}</div>
  </main>`;
- return `${firstVisit ? opening : `<main id="main-content" tabindex="-1" class="workspace">${scene()}${focusPanel()}</main>${nextCare()}${visitorSection()}`}<section class="below-garden"><div><span class="eyebrow">A LITTLE EVERY DAY</span><p>작은 알 하나에서,<br><strong>나만의 정원으로.</strong></p></div><ol class="journey"><li class="${state.tutorialClaimed?'done':''}"><span>01</span>알 고르기</li><li class="${state.pets.length?'done':''}"><span>02</span>함께 자라기</li><li class="${state.pets.some(p=>p.stage==='adult')?'done':''}"><span>03</span>도감 채우기</li></ol><span class="local-label">◌ ${desktop?"이 Mac에 저장됩니다":"이 브라우저에 저장됩니다"}</span></section>`;}
+ return `${firstVisit ? opening : `<main id="main-content" tabindex="-1" class="workspace">${scene()}${focusPanel()}</main>${nextCare()}${visitorSection()}`}<section class="below-garden"><div><span class="eyebrow">A LITTLE EVERY DAY</span><p>작은 알 하나에서,<br><strong>나만의 정원으로.</strong></p></div><ol class="journey"><li class="${state.tutorialClaimed?'done':''}"><span>01</span>알 고르기</li><li class="${state.pets.length?'done':''}"><span>02</span>함께 자라기</li><li class="${state.pets.some(p=>p.stage==='adult')?'done':''}"><span>03</span>진화시키기</li></ol><span class="local-label">◌ ${desktop?"이 Mac에 저장됩니다":"이 브라우저에 저장됩니다"}</span></section>`;}
 let guideHabitat=0;
 let guideElement='전체';
 let guideMissing=false;
@@ -110,18 +127,18 @@ function guideControls(count){
  const grown=state.pets.filter(p=>p.stage==='adult').length;
  return `<section class="guide-index" aria-label="도감 찾아보기">
  <div role="group" aria-label="서식지 도감">${habitatNames.map((h,i)=>`<button data-habitat="${i}" aria-pressed="${i===guideHabitat}">${h} ${state.pets.filter(p=>habitatOf(p.id)===i).length}/6</button>`).join('')}</div>
- <p>${guideHabitat>openHabitat(state)?habitatNames[guideHabitat-1]+' 친구 6종을 성장시키면 이곳의 알이 열려요.':'이곳의 알을 키울 수 있어요.'}</p><p>발견 <strong>${state.pets.length}종</strong> · 성장 <strong>${grown}종</strong></p>
+ <p>${guideHabitat>openHabitat(state)?habitatNames[guideHabitat-1]+' 친구 6종을 성장시키면 이곳의 알이 열려요.':'이곳의 알을 키울 수 있어요.'}</p><p>발견 <strong>${state.pets.length}종</strong> · 진화 <strong>${grown}종</strong></p>
  <div role="group" aria-label="속성 선택">${['전체','불','물','풀'].map(el=>`<button data-element="${el}" aria-pressed="${guideElement===el}">${el}</button>`).join('')}
  <button data-guide-missing aria-pressed="${guideMissing}">미발견만</button></div>
  <small role="status">${guideElement==='전체'?'모든 속성':guideElement+' 속성'} · ${count}종 표시</small></section>`;
 }
 function collectionPage(petsOnly=false) {
  const ids=petsOnly?state.pets.map(p=>p.id):Object.keys(content).filter(id=>habitatOf(id)===guideHabitat&&(guideElement==='전체'||elements[id]===guideElement)&&(!guideMissing||!state.pets.some(p=>p.id===id)));
- return `<main id="main-content" tabindex="-1" class="collection-page"><div class="page-title"><div><span class="eyebrow">${petsOnly?'OUR LITTLE FAMILY':'FIELD NOTES · VOL. 01'}</span><h1>${petsOnly?'내 펫':'모아몬 도감'}</h1><p>${petsOnly?'함께할 파트너를 골라주세요.':habitatLore[guideHabitat]}</p></div><div class="collection-count">${state.pets.length}<span> / ${Object.keys(content).length}종</span></div></div>${petsOnly?'':guideControls(ids.length)}${!petsOnly&&!ids.length?'<p>이 속성의 친구를 모두 만났어요. 미발견만 보기를 끄면 다시 볼 수 있어요.</p>':''}${petsOnly&&!ids.length?'<div class="empty-state"><p>아직 만난 친구가 없어요.</p><button class="primary" data-action="eggs">첫 알 고르기 →</button></div>':''}<div class="bestiary">${ids.map((id,i)=>{const p=state.pets.find(p=>p.id===id);return `<button class="creature-entry ${p?'owned':'locked'}" data-detail="${id}"><span class="entry-number">NO. ${String(Object.keys(content).indexOf(id)+1).padStart(2,'0')}</span><div class="specimen ${content[id].color}">${sprite(id,p?.stage||'adult',p?'':'silhouette')}<span class="specimen-ground"></span></div><div class="entry-title"><h2>${esc(p?name(id):content[id].name)}</h2><span>${p?p.stage==='adult'?'성장':'아기':'미발견'}</span></div><p>${elements[id]} 속성 · ${content[id].kind}</p><div class="entry-footer">${p?`${state.partner===id?'● 파트너 · ':''}${new Date(p.hatchedAt).toLocaleDateString(locale==='ko'?'ko-KR':'en-US')} 만남`:content[id].description}<span>↗</span></div></button>`}).join('')}</div>${petsOnly?'':relationships()}<p class="collection-note">서식지마다 여섯 친구가 살아요. 아기와 성장한 모습은 같은 친구예요. 친구 이야기 ${pairs.filter(([id])=>friendship(id,state.pets).complete).length} / ${pairs.length}개를 발견했어요.</p></main>`;
+ return `<main id="main-content" tabindex="-1" class="collection-page"><div class="page-title"><div><span class="eyebrow">${petsOnly?'OUR LITTLE FAMILY':'FIELD NOTES · VOL. 01'}</span><h1>${petsOnly?'내 펫':'모아몬 도감'}</h1><p>${petsOnly?'펫을 눌러 진화 전후 모습을 확인해 보세요.':habitatLore[guideHabitat]}</p></div><div class="collection-count">${state.pets.length}<span> / ${Object.keys(content).length}종</span></div></div>${petsOnly?'':guideControls(ids.length)}${!petsOnly&&!ids.length?'<p>이 속성의 친구를 모두 만났어요. 미발견만 보기를 끄면 다시 볼 수 있어요.</p>':''}${petsOnly&&!ids.length?'<div class="empty-state"><p>아직 만난 친구가 없어요.</p><button class="primary" data-action="eggs">첫 알 고르기 →</button></div>':''}<div class="bestiary">${ids.map((id,i)=>{const p=state.pets.find(p=>p.id===id);return `<button class="creature-entry ${p?'owned':'locked'}" data-detail="${id}"><span class="entry-number">NO. ${String(Object.keys(content).indexOf(id)+1).padStart(2,'0')}</span><div class="specimen ${content[id].color}">${sprite(id,p?.finalForm?'final':p?.stage||'adult',p?'':'silhouette')}<span class="specimen-ground"></span></div><div class="entry-title"><h2>${esc(p?name(id):content[id].name)}</h2><span>${p?p.finalForm?'최종 진화':p.stage==='adult'?'1차 진화':'아기':'미발견'}</span></div><p>${elements[id]} 속성 · ${content[id].kind}</p><div class="entry-footer">${p?`${state.partner===id?'● 파트너 · ':''}${new Date(p.hatchedAt).toLocaleDateString(locale==='ko'?'ko-KR':'en-US')} 만남`:content[id].description}<span>↗</span></div></button>`}).join('')}</div>${petsOnly?'':relationships()}<p class="collection-note">서식지마다 여섯 친구가 살아요. 아기와 진화 모습은 같은 친구예요. 친구 이야기 ${pairs.filter(([id])=>friendship(id,state.pets).complete).length} / ${pairs.length}개를 발견했어요.</p></main>`;
 }
 function menuCare(){
  const ready=state.phase.endsWith('ready');
- if(ready)return ['confirm',state.phase==='hatch_ready'?'알 부화시키기':'성장한 모습 보기'];
+ if(ready)return ['confirm',state.phase==='hatch_ready'?'알 부화시키기':'진화시키기'];
  if(state.phase==='idle')return ['eggs',state.tutorialClaimed?'다음 알 고르기':'첫 알 고르기'];
  return ['toggle',running?'잠깐 쉬기':'같이 작업하기'];
 }
@@ -131,11 +148,11 @@ function updateMenu(){
  const line=state.active ? name(state.active.id)+' · '+(state.phase.endsWith('ready')?'준비 완료':duration(targetSeconds(state)-state.active.progress)+' 남음') : stageText();
  const label=menuCare()[1];
  const pet=state.pets.find(p=>p.id===(state.partner || state.active?.id));
- const spriteKey=pet ? pet.id+'-'+pet.stage : 'egg';
+ const spriteKey=pet ? pet.id+'-'+(pet.finalForm?'final':pet.stage) : 'egg';
  const still=state.settings.reducedMotion || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- const signature=JSON.stringify([line,label,spriteKey,still]);
+ const signature=JSON.stringify([line,label,spriteKey,still,running]);
  if(previousMenu===signature)return;
- desktop.menu(t(line),t(label),spriteKey,still);previousMenu=signature;
+ desktop.menu(t(line),t(label),spriteKey,still,running);previousMenu=signature;
 }
 window.addEventListener('moamon-activity',event=>{
  if(!canWrite())return;
@@ -144,6 +161,19 @@ window.addEventListener('moamon-activity',event=>{
  const changed=next.phase!==state.phase;commit(next);
  if(changed)notify('AI 작업과 함께 친구가 자랐어요. 새로운 모습을 확인해 주세요.');
 });
+function toggleSession(){
+ if(!canWrite())return 'blocked';
+ if(running){pause('잠시 쉬어가요. 지금까지의 시간은 저장했어요.');return 'paused';}
+ if(!['incubating','raising','complete'].includes(state.phase))return 'needs-garden';
+ if(state.daily>=MODES[mode].cap && dayKey()<=state.day){
+  notify('오늘 적립할 수 있는 시간을 모두 채웠어요. 내일 다시 함께해요.');return 'daily-limit';
+ }
+ if(sessionLimit&&sessionElapsed>=sessionLimit)sessionElapsed=0;
+ petFocus=desktop?.backgroundFocus===true;
+ running=true;lastTick=performance.now();lastWall=Date.now();render();void keepPhoneScreenOn();
+ return 'started';
+}
+if(desktop)window.moamonTogglePetFocus=()=>toggleSession();
 window.addEventListener('moamon-pet-care',()=>{
  if(!canWrite())return;
  const id=state.pets.find(p=>p.id===(state.partner||state.active?.id))?.id;
@@ -153,15 +183,33 @@ window.addEventListener('moamon-care',()=>{
  if(document.querySelector('dialog[open]')||!canWrite())return;
  page='garden';render();document.querySelector('[data-action="'+menuCare()[0]+'"]')?.click();
 });
+function quickActions(){
+ if(!state.tutorialClaimed&&state.phase==='idle')return '';
+ const partner=state.pets.find(p=>p.id===state.partner);
+ const [action, nextLabel]=menuCare();
+ const label=action==='toggle'&&running?'일시정지':nextLabel;
+ const remaining=state.active&&!state.phase.endsWith('ready')
+  ?duration(targetSeconds(state)-state.active.progress)
+  :stageText();
+ const clock=running
+  ?`<span id="quick-session-clock" aria-label="함께한 시간">${time(sessionElapsed)}</span><span aria-hidden="true"> · </span>`
+  :'';
+ return `<section class="quick-actions" aria-label="빠른 펫 조작" data-running="${running}">
+   <div class="quick-status"><span class="quick-dot" aria-hidden="true"></span><span><strong>${esc(partner?name(partner.id):'내 정원')}</strong><small>${clock}<span id="quick-remaining">${remaining}</span></small></span></div>
+   ${partner?`<button class="secondary quick-care" data-action="quick-care" ${!canWrite()?'disabled':''}>돌보기</button>`:''}
+   <button class="primary" data-action="${action}" ${!canWrite()?'disabled':''}>${label}</button>
+ </section>`;
+}
 function render(){
  updateMenu();
  const open=$('dialog[open]'); if(open) return;
  const focus=document.activeElement?.dataset;const restore=focus?.action || null;
+ const wasQuick=document.activeElement?.closest?.('.quick-actions')!=null;
  document.body.classList.toggle('reduce-motion',state.settings.reducedMotion);
- $('#app').innerHTML=`${header()}${updateReady?'<div class="update-banner" role="status"><span>새 버전이 준비됐어요. 현재 진행을 저장하고 업데이트할 수 있어요.</span><button data-action="update">업데이트</button></div>':''}${mode==='demo'?'<div class="mode-banner"><span>빠른 체험 중 · 일반 정원과 별도로 저장돼요</span><button data-action="normal">일반 정원으로 →</button></div>':''}${!lockOwned&&lockResolved?'<div class="warning" role="status">다른 탭에서 이 정원을 열고 있어요. 이 탭은 둘러보기만 할 수 있습니다. 다른 탭을 닫은 후 새로고침해 주세요.</div>':''}${notice?`<div class="warning" role="status">${esc(notice)}</div>`:''}${page==='garden'?gardenPage():page==='journal'?journalPage():collectionPage(page==='pets')}<section class="community"><span>작은 정원이 마음에 드셨나요?</span><div><button data-action="share">정원 공유하기 ↗</button><a href="${REPOSITORY}" target="_blank" rel="noopener noreferrer">☆ GitHub에서 Star</a><button data-action="help">이용 안내</button>${!installed()?'<button data-action="install">앱 설치</button>':''}</div></section><footer><span>MOAMON <span class="footer-dot">·</span> 작은 동료와 함께하는 시간</span><span>${desktop?"MAC APP":"WEB APP"} 0.7.0</span></footer><div id="toast" role="status" aria-live="polite"></div><dialog id="modal" aria-labelledby="modal-title"></dialog>`;
+ $('#app').innerHTML=`${header()}${updateReady?'<div class="update-banner" role="status"><span>새 버전이 준비됐어요. 현재 진행을 저장하고 업데이트할 수 있어요.</span><button data-action="update">업데이트</button></div>':''}${mode==='demo'?'<div class="mode-banner"><span>빠른 체험 중 · 일반 정원과 별도로 저장돼요</span><button data-action="normal">일반 정원으로 →</button></div>':''}${!lockOwned&&lockResolved?'<div class="warning" role="status">다른 탭에서 이 정원을 열고 있어요. 이 탭은 둘러보기만 할 수 있습니다. 다른 탭을 닫은 후 새로고침해 주세요.</div>':''}${notice?`<div class="warning" role="status">${esc(notice)}</div>`:''}${page==='garden'?gardenPage():page==='journal'?journalPage():collectionPage(page==='pets')}<section class="community"><span>작은 정원이 마음에 드셨나요?</span><div><button data-action="share">정원 공유하기 ↗</button><a href="${REPOSITORY}" target="_blank" rel="noopener noreferrer">☆ GitHub에서 Star</a><button data-action="help">이용 안내</button>${!installed()?'<button data-action="install">앱 설치</button>':''}</div></section><footer><span>MOAMON <span class="footer-dot">·</span> 작은 동료와 함께하는 시간</span><span>${desktop?"MAC APP":"WEB APP"} 0.7.0</span></footer>${quickActions()}<div id="toast" role="status" aria-live="polite"></div><dialog id="modal" aria-labelledby="modal-title"></dialog>`;
  localize($('#app'));document.querySelector('.skip-link').textContent=locale==='en'?'Skip to content':'본문으로 건너뛰기';
  if(!canWrite())document.querySelectorAll('[data-action="toggle"],[data-action="confirm"],[data-action="eggs"]').forEach(el=>el.disabled=true);
- if(restore)document.querySelector(`[data-action="${restore}"]`)?.focus({preventScroll:true});
+ if(restore)document.querySelector(`${wasQuick?'.quick-actions ':''}[data-action="${restore}"]`)?.focus({preventScroll:true});
 }
 function openModal(html,kind){const modal=$('#modal');
  const el=document.activeElement;
@@ -173,15 +221,19 @@ function eggs(){
  if(recommended)available=[recommended,...available.filter(id=>id!==recommended)];
  openModal(`<span class="eyebrow">A NEW FRIEND</span><h2 id="modal-title">${state.tutorialClaimed?'다음 친구를 만나볼까요?':'첫 번째 알을 골라주세요'}</h2><p>${state.tutorialClaimed?`함께한 시간 ${duration(MODES[mode].hatch)} 후 부화해요.`:'첫 알은 기다림 없이 바로 만날 수 있어요.'}</p><div class="egg-choices">${available.map(id=>`<button class="egg-choice ${content[id].color}" data-egg="${id}"><div>${sprite(id)}</div><strong>${content[id].name}${id===recommended?' · 추천':''}</strong><span>${elements[id]} 속성 · ${content[id].kind}</span><small>${content[id].description}</small><small>${state.pets.some(p=>p.id===friendship(id,state.pets).other)?'정원의 친구와 함께할 수 있어요 · ':''}${content[friendship(id,state.pets).other].name}와 이어지는 이야기 · ${friendship(id,state.pets).title}</small><b>이 친구의 알 고르기 →</b></button>`).join('')}</div><p class="modal-note">세샘숲에서는 불이 가시풀을 태우고, 풀이 물을 머금고, 물이 불씨를 식혀요. 첫 친구가 다 자라면 호롱·토리·여울의 알도 고를 수 있어요.</p>`,'eggs');
 }
-function performCare(id){
+function performCare(id,quick=false){
  if(!canWrite())return;
  const pet=state.pets.find(p=>p.id===id);if(!pet)return;
  const before=friendship(id,state.pets).complete;
  commit(recordCare(state,id));
  if(saveBlocked)return;
  desktop?.react?.();
- $('#modal').close();detail(id);
  const bond=friendship(id,state.pets);
+ if(quick&&(before||!bond.complete)){
+  notify(fieldnotes[id][pet.stage==='adult'?3:2]);
+  return;
+ }
+ $('#modal').close();detail(id);
  if(!before&&bond.complete){
   $('#modal').close();
   openModal(`<span class="eyebrow">함께 발견한 이야기</span><h2 id="modal-title">${bond.title}</h2><div class="bond-cast">${sprite(id,'adult')}${sprite(bond.other,'adult')}</div><p class="care-response">${bond.ending}</p><p>${content[id].name}와 ${content[bond.other].name}의 이야기를 도감에 기록했어요.</p><button class="primary full" data-detail="${id}">친구의 기록 보기</button>`,'bond');
@@ -206,10 +258,22 @@ function carePage(pet){
  <h3>${bond.title} · ${content[bond.other].name}와의 이야기</h3><p>${bond.complete?bond.ending:bond.hint}</p>
  <button class="text-button" data-detail="${bond.other}">${content[bond.other].name} 기록 보기 →</button>${bond.complete?'':'<small>두 친구가 다 자란 뒤 각각 한 번 돌보면 뒷이야기가 열려요.</small>'}</section>`;
 }
+function evolutionForms(id,{pet=null}={}){
+ const locked=pet?.stage==='baby';
+ const form=(stage,label)=>{
+  const hidden=pet&&(stage==='adult'&&locked||stage==='final'&&!pet.finalForm);
+  const art=`<span class="evolution-art ${content[id].color}">${sprite(id,stage,hidden?'silhouette':'')}</span><span>${label}</span>`;
+  return pet?`<button class="evolution-form" data-stage="${stage}" aria-pressed="${stagePreview===stage}" ${hidden?'disabled':''}>${art}</button>`:`<div class="evolution-form">${art}</div>`;
+ };
+ return `<div class="evolution-forms" role="group" aria-label="진화 전후">${form('baby','진화 전 · 아기')}<span class="evolution-arrow" aria-hidden="true">${icon('arrow')}</span>${form('adult','1차 진화')}<span class="evolution-arrow" aria-hidden="true">→</span>${form('final','최종 진화')}</div>`;
+}
+function revealEvolution(id){
+ openModal(`<span class="eyebrow">진화 완료</span><h2 id="modal-title">${esc(name(id))}의 진화!</h2>${evolutionForms(id,{pet:state.pets.find(p=>p.id===id)})}<p>${content[id].adult}</p><p class="modal-note">진화 모습이 도감에 기록됐어요.</p><button class="primary full" data-action="close">정원으로 돌아가기 →</button><button class="secondary full" data-detail="${id}">진화한 펫 돌보기 →</button>`,'evolution');
+}
 function detail(id,stage){
- const pet=state.pets.find(p=>p.id===id);selectedPet=id;stagePreview=stage||pet?.stage||'adult';
+ const pet=state.pets.find(p=>p.id===id);selectedPet=id;stagePreview=stage||(pet?.finalForm?'final':pet?.stage)||'adult';
  if(!pet){openModal(`<span class="eyebrow">NOT YET DISCOVERED</span><h2 id="modal-title">${content[id].name}</h2><div class="detail-art ${content[id].color}">${sprite(id,'adult','silhouette')}</div><p>${content[id].description}</p><p><strong>${elements[id]} 속성</strong> · ${starters.includes(id)&&!state.tutorialClaimed?'첫 알에서 선택할 수 있어요.':(habitatOf(id)>openHabitat(state)?habitatNames[habitatOf(id)-1]+'의 여섯 친구를 성장시켜 주세요.':'다음 알에서 선택할 수 있어요.')}</p><button class="primary full" data-action="close">기다릴게요</button>`,'detail');return;}
- openModal(`<span class="eyebrow">NO. ${String(Object.keys(content).indexOf(id)+1).padStart(2,'0')} · ${content[id].kind}</span><h2 id="modal-title">${esc(name(id))}</h2><div class="detail-art ${content[id].color}">${sprite(id,stagePreview)}</div><div class="stage-options"><button data-stage="baby" aria-pressed="${stagePreview==='baby'}">아기</button><button data-stage="adult" aria-pressed="${stagePreview==='adult'}" ${pet.stage!=='adult'?'disabled':''}>성장 ${pet.stage!=='adult'?'🔒':''}</button></div><p>${stagePreview==='adult'?content[id].adult:content[id].description}</p>${carePage(pet)}<section class="pet-profile" aria-label="펫 정보"><h3>정보</h3><p><strong>속성</strong> ${elements[id]} · ${affinity[elements[id]]}에 강해요</p><p><strong>성격</strong> ${esc(profiles[id].personality)}</p><p><strong>좋아하는 것</strong> ${profiles[id].likes.map(esc).join(" · ")}</p><p><strong>작은 반응</strong> ${esc(profiles[id].reaction)}</p></section><details><summary>이야기</summary><h3>우리의 설정</h3><p>${esc(profiles[id].adaptation)}</p><h3>전승과 출처</h3><p>${esc(profiles[id].tradition)}</p>${sourceLinks[id]?`<a class="source-link" href="${sourceLinks[id].url}" target="_blank" rel="noopener noreferrer">${sourceLinks[id].id} · ${sourceLinks[id].title} ↗</a>`:""}<small>캐릭터 이름과 디자인은 창작안이며 전승 자체와 구분해요.</small></details><section class="pet-record" aria-label="함께한 기록"><h3>함께한 기록</h3><p>만난 날 <time datetime="${esc(pet.hatchedAt)}">${new Date(pet.hatchedAt).toLocaleDateString(locale==='ko'?'ko-KR':'en-US')}</time></p>${pet.grownAt?`<p>성장한 날 <time datetime="${esc(pet.grownAt)}">${new Date(pet.grownAt).toLocaleDateString(locale==='ko'?'ko-KR':'en-US')}</time></p>`:"<p>아직 함께 자라는 중이에요.</p>"}</section><form id="rename-form"><label for="nickname">별명 <span>선택 · 최대 20자</span></label><div class="rename-row"><input id="nickname" name="nickname" maxlength="20" value="${esc(pet.nickname)}" placeholder="${content[id].name}" ${!canWrite()?'disabled':''}><button class="secondary" ${!canWrite()?'disabled':''}>저장</button></div></form><button class="primary full" data-partner="${id}" ${!canWrite()||state.partner===id?'disabled':''}>${state.partner===id?'지금 함께하는 파트너':'파트너로 선택'}</button>`,'detail');
+ openModal(`<span class="eyebrow">NO. ${String(Object.keys(content).indexOf(id)+1).padStart(2,'0')} · ${content[id].kind}</span><h2 id="modal-title">${esc(name(id))}</h2>${evolutionForms(id,{pet})}${pet.stage!=='adult'?'<p class="evolution-hint">같이 작업해 시간을 채우면 진화할 수 있어요.</p>':''}<p>${stagePreview!=='baby'?content[id].adult:content[id].description}</p>${pet.stage==='adult'&&!pet.finalForm?`<button class="primary full" data-final="${id}" ${!canWrite()||!['idle','complete'].includes(state.phase)?'disabled':''}>최종 진화 키우기</button><p class="modal-note">1차 진화 다음에는 함께한 시간이 두 배 더 필요해요.</p>`:''}${carePage(pet)}<section class="pet-profile" aria-label="펫 정보"><h3>정보</h3><p><strong>속성</strong> ${elements[id]} · ${affinity[elements[id]]}에 강해요</p><p><strong>성격</strong> ${esc(profiles[id].personality)}</p><p><strong>좋아하는 것</strong> ${profiles[id].likes.map(esc).join(" · ")}</p><p><strong>작은 반응</strong> ${esc(profiles[id].reaction)}</p></section><details><summary>이야기</summary><h3>우리의 설정</h3><p>${esc(profiles[id].adaptation)}</p><h3>전승과 출처</h3><p>${esc(profiles[id].tradition)}</p>${sourceLinks[id]?`<a class="source-link" href="${sourceLinks[id].url}" target="_blank" rel="noopener noreferrer">${sourceLinks[id].id} · ${sourceLinks[id].title} ↗</a>`:""}<small>캐릭터 이름과 디자인은 창작안이며 전승 자체와 구분해요.</small></details><section class="pet-record" aria-label="함께한 기록"><h3>함께한 기록</h3><p>만난 날 <time datetime="${esc(pet.hatchedAt)}">${new Date(pet.hatchedAt).toLocaleDateString(locale==='ko'?'ko-KR':'en-US')}</time></p>${pet.grownAt?`<p>진화한 날 <time datetime="${esc(pet.grownAt)}">${new Date(pet.grownAt).toLocaleDateString(locale==='ko'?'ko-KR':'en-US')}</time></p>`:"<p>아직 함께 자라는 중이에요.</p>"}</section><form id="rename-form"><label for="nickname">별명 <span>선택 · 최대 20자</span></label><div class="rename-row"><input id="nickname" name="nickname" maxlength="20" value="${esc(pet.nickname)}" placeholder="${content[id].name}" ${!canWrite()?'disabled':''}><button class="secondary" ${!canWrite()?'disabled':''}>저장</button></div></form><button class="primary full" data-partner="${id}" ${!canWrite()||state.partner===id?'disabled':''}>${state.partner===id?'지금 함께하는 파트너':'파트너로 선택'}</button>`,'detail');
 }
 function activitySettings(){
  if(!desktop||mode!=='normal')return '';
@@ -218,11 +282,11 @@ function activitySettings(){
 function desktopSettings(){
  if(!desktop?.companion)return '';
  const status=desktop.companion('status');
- return `<section class="setting-section"><h3>바탕화면 친구</h3><p>정원의 파트너가 화면 위에 함께 있어요. 클릭하면 메뉴, 두 번 클릭하면 정원이 열려요.</p><p id="companion-status" role="status">${status.visible?'표시 중':'숨겨짐'} · ${status.size===144?'크게':'작게'}</p><div class="button-row"><button class="secondary" data-companion="toggle">표시 / 숨기기</button><button class="secondary" data-companion="small">작게</button><button class="secondary" data-companion="large">크게</button></div><button class="text-button" data-companion="reset">화면 오른쪽 아래로 데려오기</button></section>`;
+ return `<section class="setting-section"><h3>바탕화면 펫</h3><p>한 번 클릭하면 집중 시작·정지, 두 번 클릭하면 정원이 열려요. 메뉴는 오른쪽 클릭으로 열어요.</p><p id="companion-status" role="status">${status.visible?'표시 중':'숨겨짐'} · ${status.size===144?'크게':'작게'}</p><div class="button-row"><button class="secondary" data-companion="toggle">표시 / 숨기기</button><button class="secondary" data-companion="small">작게</button><button class="secondary" data-companion="large">크게</button></div><button class="text-button" data-companion="reset">화면 오른쪽 아래로 데려오기</button></section>`;
 }
-function settings(){pause();openModal(`<span class="eyebrow">MAKE YOURSELF AT HOME</span><h2 id="modal-title">정원 설정</h2>${desktopSettings()}${activitySettings()}<section class="setting-section"><h3>편안하게 보기</h3><label class="switch-row">동작 줄이기<input type="checkbox" id="motion" ${state.settings.reducedMotion?'checked':''} ${!canWrite()?'disabled':''}></label><label class="select-row" for="decoration">정원 소품<select id="decoration" ${!canWrite()?'disabled':''}>${[['flowers','들꽃'],['mushrooms','버섯'],['stones','조약돌']].map(([v,l])=>`<option value="${v}" ${state.settings.decoration===v?'selected':''}>${l}</option>`).join('')}</select></label></section><section class="setting-section"><h3>내 진행 보관하기</h3><p>${desktop?"진행은 이 Mac의 앱 데이터 폴더에 저장돼요.":"진행은 이 브라우저에만 저장돼요."} 브라우저 데이터를 지우기 전에 파일을 보관해 주세요.</p><div class="button-row"><button class="secondary" data-action="export">파일 내보내기</button><button class="secondary" data-action="import" ${!lockOwned?'disabled':''}>파일 가져오기</button><input type="file" id="import-file" accept="application/json,.json" hidden></div><p id="import-status" role="status"></p></section><section class="setting-section"><h3>${mode==='demo'?'일반 정원으로 돌아가기':'먼저 짧게 체험해 보기'}</h3><p>체험 모드에서는 부화 15초, 성장 30초로 친구들을 만나볼 수 있어요. 일반 진행과 섞이지 않아요.</p><button class="secondary" data-action="${mode==='demo'?'normal':'demo'}">${mode==='demo'?'일반 정원 열기':'빠른 체험 열기'} →</button></section><section class="setting-section danger-section"><button class="text-button" data-action="reset" ${!lockOwned?'disabled':''}>${mode==='demo'?'체험':'현재 정원'} 진행 초기화</button></section><p class="modal-note">로그인 · 광고 · 분석 수집 없음<br>화면을 벗어나거나 잠자기 상태가 되면 함께한 시간 적립이 멈춥니다.</p>`,'settings');}
+function settings(){pause();openModal(`<span class="eyebrow">MAKE YOURSELF AT HOME</span><h2 id="modal-title">정원 설정</h2>${desktopSettings()}${activitySettings()}<section class="setting-section"><h3>편안하게 보기</h3><label class="switch-row">동작 줄이기<input type="checkbox" id="motion" ${state.settings.reducedMotion?'checked':''} ${!canWrite()?'disabled':''}></label><label class="select-row" for="decoration">정원 소품<select id="decoration" ${!canWrite()?'disabled':''}>${[['flowers','들꽃'],['mushrooms','버섯'],['stones','조약돌']].map(([v,l])=>`<option value="${v}" ${state.settings.decoration===v?'selected':''}>${l}</option>`).join('')}</select></label></section><section class="setting-section"><h3>내 진행 보관하기</h3><p>${desktop?"진행은 이 Mac의 앱 데이터 폴더에 저장돼요.":"진행은 이 브라우저에만 저장돼요."} 브라우저 데이터를 지우기 전에 파일을 보관해 주세요.</p><div class="button-row"><button class="secondary" data-action="export">파일 내보내기</button><button class="secondary" data-action="import" ${!lockOwned?'disabled':''}>파일 가져오기</button><input type="file" id="import-file" accept="application/json,.json" hidden></div><p id="import-status" role="status"></p></section><section class="setting-section"><h3>${mode==='demo'?'일반 정원으로 돌아가기':'먼저 짧게 체험해 보기'}</h3><p>체험 모드에서는 부화 15초, 성장 30초로 친구들을 만나볼 수 있어요. 일반 진행과 섞이지 않아요.</p><button class="secondary" data-action="${mode==='demo'?'normal':'demo'}">${mode==='demo'?'일반 정원 열기':'빠른 체험 열기'} →</button></section><section class="setting-section danger-section"><button class="text-button" data-action="reset" ${!lockOwned?'disabled':''}>${mode==='demo'?'체험':'현재 정원'} 진행 초기화</button></section><p class="modal-note">로그인 · 광고 · 분석 수집 없음<br>${desktop?.backgroundFocus?'맥에서 시작한 집중은 정원 창을 닫아도 이어져요. 잠자기 전에는 자동으로 멈춰요.':'화면을 벗어나거나 잠자기 상태가 되면 함께한 시간 적립이 멈춥니다.'}</p>`,'settings');}
 function help(){
- pause();openModal(`<span class="eyebrow">WELCOME TO MOAMON</span><h2 id="modal-title">작은 정원 이용 안내</h2><ol class="help-steps"><li><strong>첫 알 고르기</strong><p>세 친구 중 하나를 고르세요. 첫 알은 바로 부화해요.</p></li><li><strong>같이 작업하기</strong><p>일반 정원은 부화 5분 · 성장 15분, 빠른 체험은 부화 15초 · 성장 30초예요. 하루 최대 150분이 성장에 반영돼요.</p></li><li><strong>성장 확인하고 다음 알 고르기</strong><p>도감에서 아기와 성장한 모습을 보고 파트너를 바꿀 수 있어요.</p></li></ol><details open><summary>화면을 닫아도 자라나요?</summary><p>이 화면이 보이는 동안만 적립돼요. 탭 이동·화면 잠금·긴 대기에는 멈추고, 다시 돌아오면 같이 작업하기을 눌러주세요. 다른 앱 작업 중의 지속 적립은 데스크톱 버전에서 검증할 예정이에요.</p></details><details><summary>진행은 어디에 저장되나요?</summary><p>이 브라우저의 저장소에 저장돼요. 기기·브라우저·사이트 주소가 바뀌면 별도 정원으로 열려요. 설정에서 파일을 내보내 보관하고 같은 모드에 가져올 수 있어요. 브라우저 데이터를 지우면 진행도 사라져요.</p></details><details><summary>어떤 정보를 수집하나요?</summary><p>앱은 집중 세션의 시간만 로컬에서 계산해요. 작업 내용·키보드 입력·클립보드를 수집하지 않으며 분석 추적 도구를 사용하지 않아요. 사이트를 제공하는 호스팅 서비스는 접속 로그를 처리할 수 있어요. GitHub 링크는 외부 사이트를 열어요.</p></details><p>브라우저 알파 버전이에요. 문제가 생기면 사용한 브라우저와 재현 순서를 알려주세요. 저장 파일에는 별명이 있으니 공개 이슈에 첨부하기 전에 확인해 주세요.</p><a class="secondary feedback-link" href="${REPOSITORY}/issues" target="_blank" rel="noopener noreferrer">GitHub에 의견 남기기 ↗</a>`,'help');
+ pause();openModal(`<span class="eyebrow">WELCOME TO MOAMON</span><h2 id="modal-title">작은 정원 이용 안내</h2><ol class="help-steps"><li><strong>첫 알 고르기</strong><p>세 친구 중 하나를 고르세요. 첫 알은 바로 부화해요.</p></li><li><strong>같이 작업하기</strong><p>일반 정원은 부화 5분 · 성장 15분, 빠른 체험은 부화 15초 · 성장 30초예요. 하루 최대 150분이 성장에 반영돼요.</p></li><li><strong>진화시키고 다음 알 고르기</strong><p>도감에서 진화 전후를 보고 파트너를 바꿀 수 있어요.</p></li></ol><details open><summary>화면을 닫아도 자라나요?</summary><p>${desktop?.backgroundFocus?'맥에서 시작한 집중은 정원 창을 닫아도 이어져요. 잠자기 전에는 자동으로 멈춰요.':'이 화면이 보이는 동안만 적립돼요. 탭 이동·화면 잠금·긴 대기에는 멈추고, 다시 돌아오면 같이 작업하기을 눌러주세요. 다른 앱 작업 중의 지속 적립은 데스크톱 버전에서 검증할 예정이에요.'}</p></details><details><summary>진행은 어디에 저장되나요?</summary><p>이 브라우저의 저장소에 저장돼요. 기기·브라우저·사이트 주소가 바뀌면 별도 정원으로 열려요. 설정에서 파일을 내보내 보관하고 같은 모드에 가져올 수 있어요. 브라우저 데이터를 지우면 진행도 사라져요.</p></details><details><summary>어떤 정보를 수집하나요?</summary><p>앱은 집중 세션의 시간만 로컬에서 계산해요. 작업 내용·키보드 입력·클립보드를 수집하지 않으며 분석 추적 도구를 사용하지 않아요. 사이트를 제공하는 호스팅 서비스는 접속 로그를 처리할 수 있어요. GitHub 링크는 외부 사이트를 열어요.</p></details><p>브라우저 알파 버전이에요. 문제가 생기면 사용한 브라우저와 재현 순서를 알려주세요. 저장 파일에는 별명이 있으니 공개 이슈에 첨부하기 전에 확인해 주세요.</p><a class="secondary feedback-link" href="${REPOSITORY}/issues" target="_blank" rel="noopener noreferrer">GitHub에 의견 남기기 ↗</a>`,'help');
 }
 function share(){
  pause();openModal(`<span class="eyebrow">A LITTLE GARDEN TO SHARE</span><h2 id="modal-title">작은 정원을 나눠보세요</h2><div class="share-preview">${state.pets.length?state.pets.map(p=>sprite(p.id,p.stage)).join(''):sprite('egg')}<strong>내 펫 도감</strong><span>${state.pets.length} / ${Object.keys(content).length}종 · ${state.pets.filter(p=>p.stage==='adult').length}종 성장</span></div><p>카드에는 모은 펫과 성장 수만 담아요. 별명과 함께한 시간은 포함하지 않아요.</p><div class="button-row"><button class="primary" data-action="share-image">카드 이미지 저장</button><button class="secondary" data-action="share-link">링크 공유</button></div><label class="share-label" for="share-url">공유할 주소</label><input id="share-url" class="share-url" readonly value="${esc(publicURL(desktop?SITE:location.href))}"><p class="modal-note">다른 사람은 자신의 새 정원에서 시작해요.</p>`,'share');
@@ -270,6 +334,7 @@ document.addEventListener('click',event=>{
  }
  if(b.dataset.detail){$('#modal').close();detail(b.dataset.detail);return;}
  if(b.dataset.stage){$('#modal').close();detail(selectedPet,b.dataset.stage);return;}
+ if(b.dataset.final){if(!canWrite())return;commit(beginFinal(state,b.dataset.final));closeModal();page='garden';render();return;}
  if(b.dataset.partner){if(!canWrite())return;state=setPartner(state,b.dataset.partner);closeModal();save();render();notify('파트너로 선택했어요.');return;}
  if(b.dataset.duration!==undefined){if(running)return;sessionLimit=Number(b.dataset.duration)*60;sessionElapsed=0;render();return;}
  const action=b.dataset.action;
@@ -278,6 +343,7 @@ document.addEventListener('click',event=>{
  if(action==='open-journal'){closeModal();page='journal';render();window.scrollTo(0,0);$('#main-content')?.focus({preventScroll:true});return;}
  if(action==='close')closeModal();
  if(action==='eggs')eggs();
+ if(action==='quick-care')performCare(state.partner,true);
  if(action==='settings')settings();
  if(action==='install')showInstall();
  if(action==='install-now')installApp().catch(()=>notify('설치 메뉴에서 다시 시도해 주세요.'));
@@ -289,18 +355,15 @@ document.addEventListener('click',event=>{
  if(action==='collection'){page='collection';render();}
  if(action==='demo'||action==='normal')switchMode(action);
  if(action==='compact'){document.body.classList.toggle('compact');render();}
- if(action==='pet'){const el=$('.scene-pet');el.classList.remove('petted');void el.offsetWidth;el.classList.add('petted');clearTimeout(reactionTimer);reactionTimer=setTimeout(()=>el.classList.remove('petted'),1400);notify(fieldnotes[state.partner][state.pets.find(p=>p.id===state.partner)?.stage==='adult'?3:2]);}
- if(action==='confirm'){
+ if(action==='pet'){const el=$('.scene-pet');el.classList.remove('petted');el.dataset.affection=['bounce','nuzzle','wiggle'][affectionIndex++%3];void el.offsetWidth;el.classList.add('petted');clearTimeout(reactionTimer);reactionTimer=setTimeout(()=>el.classList.remove('petted'),1400);notify(fieldnotes[state.partner][state.pets.find(p=>p.id===state.partner)?.stage==='adult'?3:2]);}
+ if(action==='confirm'&&state.phase.endsWith('ready')){
   const id=state.active.id, hatch=state.phase==='hatch_ready';state=confirmReady(state);save();render();
-  openModal(`<span class="eyebrow">${hatch?'HELLO, LITTLE ONE':'GROWING TOGETHER'}</span><h2 id="modal-title">${hatch?'만나서 반가워요, ':'다 자랐어요, '}${esc(name(id))}!</h2><div class="celebration ${content[id].color}">${sprite(id,hatch?'baby':'adult')}<span>✧</span><span>✧</span><span>✧</span></div><p>${hatch?content[id].description:content[id].adult}</p><p class="modal-note">${hatch?'아기 모습이 도감에 기록됐어요.':'성장한 모습이 도감에 기록됐어요.'}</p><button class="primary full" data-action="${hatch?'start-after-hatch':'close'}">${hatch?(mode==='demo'?'30초 같이 작업하기':'같이 작업하기'):'정원으로 돌아가기 →'}</button>${hatch?'<button class="text-button full" data-action="close">나중에 키우기</button>':`<button class="secondary full" data-detail="${id}">성장한 친구 돌보기 →</button>`}`,'celebration');
+  if(hatch){
+   openModal(`<span class="eyebrow">HELLO, LITTLE ONE</span><h2 id="modal-title">만나서 반가워요, ${esc(name(id))}!</h2><div class="celebration ${content[id].color}">${sprite(id,'baby')}<span>✧</span><span>✧</span><span>✧</span></div><p>${content[id].description}</p><p class="modal-note">아기 모습이 도감에 기록됐어요.</p><button class="primary full" data-action="start-after-hatch">${mode==='demo'?'30초 같이 작업하기':'같이 작업하기'}</button><button class="text-button full" data-action="close">나중에 키우기</button>`,'celebration');
+  }else revealEvolution(id);
  }
  if(action==='start-after-hatch')closeModal();
- if(action==='toggle'||action==='start-after-hatch'){
-  if(running){pause('잠시 쉬어가요. 지금까지의 시간은 저장했어요.');return;}
-  if(state.daily>=MODES[mode].cap && dayKey()<=state.day){notify('오늘 적립할 수 있는 시간을 모두 채웠어요. 내일 다시 함께해요.');return;}
-  if(sessionLimit&&sessionElapsed>=sessionLimit)sessionElapsed=0;
-  running=true;lastTick=performance.now();lastWall=Date.now();render();
- }
+ if(action==='toggle'||action==='start-after-hatch')toggleSession();
  if(action==='export'){
   const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});downloadFile(blob,`lorehatch-${mode}-${dayKey()}.json`).catch(()=>notify('파일을 내보내지 못했어요. 다시 시도해 주세요.'));
  }
@@ -318,7 +381,7 @@ document.addEventListener('submit',e=>{
 document.addEventListener('change',async e=>{
  if(!lockOwned||(saveBlocked&&e.target.id!=='import-file'))return;
  if(e.target.id==='activity'){state=connectActivity(state,e.target.checked);save();return;}
- if(e.target.id==='motion'){state.settings.reducedMotion=e.target.checked;document.body.classList.toggle('reduce-motion',e.target.checked);save();}
+ if(e.target.id==='motion'){state.settings.reducedMotion=e.target.checked;document.body.classList.toggle('reduce-motion',e.target.checked);save();updateMenu();}
  if(e.target.id==='decoration'){state.settings.decoration=e.target.value;save();}
  if(e.target.id==='import-file'){
   const file=e.target.files[0];if(!file)return;
@@ -331,22 +394,25 @@ document.addEventListener('change',async e=>{
  }
 });
 document.addEventListener('cancel',e=>{if(e.target.id==='modal'){e.preventDefault();closeModal();}},true);
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&running)pause('화면을 벗어나 시간 적립을 잠시 멈췄어요.');});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!petFocus)pause('화면을 벗어나 시간 적립을 잠시 멈췄어요.');});
+window.addEventListener('moamon-garden-closed',()=>{if(!petFocus)pause();});
 window.addEventListener('lorehatch-suspend',()=>pause('시간 적립을 멈추고 진행을 저장했어요.'));
 window.addEventListener('lorehatch-update-ready',()=>{updateReady=true;render();});
 window.addEventListener('lorehatch-installed',()=>{render();notify('앱이 설치됐어요. 앱 목록에서 정원을 열어보세요.');});
-window.addEventListener('pagehide',()=>{running=false;save();});
+window.addEventListener('pagehide',()=>{running=false;petFocus=false;releaseScreenLock();save();});
 window.addEventListener('storage',e=>{if(e.key===keyFor(mode)&&!lockOwned){const updated=load(storage,mode);state=updated.state;saveBlocked=!!updated.blocked;notice=updated.warning;render();}});
 setInterval(()=>{
- if(!running||!canWrite()||document.hidden)return;
+ if(!running||!canWrite()||(document.hidden&&!petFocus))return;
  const now=performance.now(),wallNow=Date.now(),delta=(now-lastTick)/1000,wallStart=lastWall;lastTick=now;lastWall=wallNow;
  if(delta>5||delta<0||Math.abs((wallNow-wallStart)/1000-delta)>2){pause('잠자기 또는 긴 대기를 감지해 시간 적립을 멈췄어요.');return;}
  const seconds=Math.min(delta,sessionLimit?Math.max(0,sessionLimit-sessionElapsed):delta);
  const prev=state.phase;state=earnInterval(state,seconds,wallStart);sessionElapsed+=seconds;checkpoint+=seconds;
  updateMenu();
  if(checkpoint>=5||prev!==state.phase){save();checkpoint=0;}
- if(prev!==state.phase){running=false;render();notify('새로운 모습이 기다려요. 준비되면 확인해 주세요.');return;}
+ if(prev!==state.phase){running=false;petFocus=false;releaseScreenLock();render();notify('새로운 모습이 기다려요. 준비되면 확인해 주세요.');return;}
  if((sessionLimit&&sessionElapsed>=sessionLimit)||state.daily>=MODES[mode].cap){pause(state.daily>=MODES[mode].cap?'오늘의 적립을 모두 채웠어요.':'함께한 시간이 끝났어요. 수고했어요.');return;}
+ if($('#quick-session-clock'))$('#quick-session-clock').textContent=time(sessionElapsed);
+ if($('#quick-remaining')&&state.active)$('#quick-remaining').textContent=t(duration(targetSeconds(state)-state.active.progress));
  if($('#session-clock'))$('#session-clock').textContent=time(sessionElapsed);
  if($('#remaining')&&state.active)$('#remaining').textContent=t(duration(targetSeconds(state)-state.active.progress));
  if($('progress')&&state.active)$('progress').value=state.active.progress/targetSeconds(state)*100;

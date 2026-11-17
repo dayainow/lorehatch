@@ -185,8 +185,13 @@ Claude Code 연결 안내|Claude Code setup
 Stop 명령 훅에 앱 실행 파일과|In a Stop command hook, register the app executable with
 을 등록하세요. 저장소의 docs/24-ai-activity.md를 참고해 주세요. 이 스위치만으로 훅이 설치되지는 않아요.|. See docs/24-ai-activity.md in the repository. This switch alone does not install the hook.
 신호 시각만 저장하며 프롬프트·응답·토큰·키는 읽지 않습니다. Codex 연동은 아직 지원하지 않습니다.|Only signal timestamps are saved. Prompts, responses, tokens, and keys are not read. Codex is not supported yet.
-바탕화면 친구|Desktop companion
-정원의 파트너가 화면 위에 함께 있어요. 클릭하면 메뉴, 두 번 클릭하면 정원이 열려요.|Your garden partner stays on your desktop. Click for its menu; double-click to open the garden.
+빠른 펫 조작|Quick pet controls
+돌보기|Care
+내 정원|My garden
+바탕화면 펫|Desktop pet
+한 번 클릭하면 집중 시작·정지, 두 번 클릭하면 정원이 열려요. 메뉴는 오른쪽 클릭으로 열어요.|Click once to start or pause focus. Double-click for the garden, or right-click for the menu.
+맥에서 시작한 집중은 정원 창을 닫아도 이어져요. 잠자기 전에는 자동으로 멈춰요.|Focus on Mac continues with the garden window closed and pauses when your Mac sleeps.
+맥에서 시작한 집중은 정원 창을 닫아도 이어져요.|Focus on Mac continues with the garden window closed.
 표시 중|Visible
 숨겨짐|Hidden
 표시 / 숨기기|Show / hide
@@ -305,6 +310,29 @@ JSON 저장 파일을 읽을 수 없습니다.|Could not read the JSON save file
 앱 백업 파일을 읽지 못했어요. 설정에서 복구 파일을 가져오세요.|Could not read the app backup. Import a recovery file in settings.
 앱 저장 또는 파일 작업을 완료하지 못했어요.|Could not complete the app save or file operation.
 언어|Language
+진화|Evolved
+진화할 준비가 됐어요|Ready to evolve
+진화까지|Evolves in
+진화시키기|Evolve
+체험: 부화 15초 · 진화 30초|Demo: hatch in 15s · evolve in 30s
+펫을 눌러 진화 전후 모습을 확인해 보세요.|Select a pet to see its evolution.
+진화 완료|Evolved
+아기와 진화 모습은 같은 친구예요.|A baby and its evolved form are the same species.
+서식지마다 여섯 친구가 살아요. 아기와 진화 모습은 같은 친구예요.|Six friends live in each habitat. A baby and its evolved form are the same species.
+진화한 날|Evolved on
+진화 전후|Evolution forms
+진화 전 · 아기|Before · Baby
+진화 모습|Evolved form
+진화 모습 잠김|Evolved form locked
+같이 작업해 시간을 채우면 진화할 수 있어요.|Work together to earn time and unlock evolution.
+진화 모습이 도감에 기록됐어요.|The evolved form is now in your field guide.
+진화한 펫 돌보기|Care for your evolved pet
+진화시키고 다음 알 고르기|Evolve and choose another egg
+도감에서 진화 전후를 보고 파트너를 바꿀 수 있어요.|Compare evolution forms in the field guide and choose your partner.
+1차 진화|First evolution
+최종 진화|Final evolution
+최종 진화 키우기|Raise the final form
+1차 진화 다음에는 함께한 시간이 두 배 더 필요해요.|The final evolution takes twice as much time together.
 `.trim().split('\n').map(line=>line.split('|')));
 export const koLabels={
  'MY LITTLE COMPANION':'나의 작은 친구','OUR DAYS TOGETHER':'함께한 날들','A LITTLE EVERY DAY':'하루에 조금씩','OUR LITTLE FAMILY':'우리 정원의 식구','FIELD NOTES · VOL. 01':'도감 · 첫 번째 기록','A NEW FRIEND':'새로운 친구','NOT YET DISCOVERED':'아직 만나지 못한 친구','MAKE YOURSELF AT HOME':'편안한 나의 정원','WELCOME TO MOAMON':'모아몬에 오신 것을 환영해요','A LITTLE GARDEN TO SHARE':'함께 나누는 작은 정원','HELLO, LITTLE ONE':'첫 인사를 나눠요','GROWING TOGETHER':'함께 자랐어요','MY LITTLE GARDEN':'나의 작은 정원','MAC APP':'맥 앱','WEB APP':'웹 앱','NO.':'번호','Theoi · Pegasus':'테오이 · 페가수스'

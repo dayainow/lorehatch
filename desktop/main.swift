@@ -12,7 +12,7 @@ final class LocalSite {
     var port: UInt16 { listener.port!.rawValue }
     var home: URL { URL(string: "http://127.0.0.1:\(port)/\(token)/")! }
     init(root: URL) throws {
-        self.root = root
+        self.root = root.standardizedFileURL
         let parameters = NWParameters.tcp
         parameters.requiredLocalEndpoint = .hostPort(host: "127.0.0.1", port: .any)
         listener = try NWListener(using: parameters)
@@ -40,6 +40,12 @@ final class LocalSite {
             } else if !complete { self.receive(connection, data: request) } else { connection.cancel() }
         }
     }
+    func bundledFile(named name: String) -> Data? {
+        let file = root.appendingPathComponent(name).standardizedFileURL
+        guard !name.split(separator: "/").contains(where: { $0.hasPrefix(".") }),
+              file.path.hasPrefix(root.path + "/") else { return nil }
+        return try? Data(contentsOf: file)
+    }
     func respond(_ connection: NWConnection, request: String) {
         let first = request.components(separatedBy: "\r\n").first?.split(separator: " ") ?? []
         var body = Data(); var status = "404 Not Found"; var type = "text/plain"
@@ -48,10 +54,9 @@ final class LocalSite {
            parts.path.hasPrefix("/\(token)/") {
             let relative = String(parts.path.dropFirst(token.count+2))
             let name = relative.isEmpty ? "index.html" : relative
-            let file = root.appendingPathComponent(name).standardizedFileURL
-            if !name.split(separator: "/").contains(where: { $0.hasPrefix(".") }), file.path.hasPrefix(root.path+"/"), let data = try? Data(contentsOf: file) {
+            if let data = bundledFile(named: name) {
                 body = data; status = "200 OK"
-                type = ["html":"text/html; charset=utf-8", "mjs":"text/javascript; charset=utf-8", "js":"text/javascript; charset=utf-8", "css":"text/css; charset=utf-8", "json":"application/json", "svg":"image/svg+xml", "png":"image/png", "woff2":"font/woff2", "webmanifest":"application/manifest+json"][file.pathExtension] ?? "application/octet-stream"
+                type = ["html":"text/html; charset=utf-8", "mjs":"text/javascript; charset=utf-8", "js":"text/javascript; charset=utf-8", "css":"text/css; charset=utf-8", "json":"application/json", "svg":"image/svg+xml", "png":"image/png", "woff2":"font/woff2", "webmanifest":"application/manifest+json"][(name as NSString).pathExtension] ?? "application/octet-stream"
             }
         }
         if ProcessInfo.processInfo.environment["LOREHATCH_DEBUG"] == "1" { fputs("Local response: \(status), \(body.count) bytes\n", stderr) }
@@ -81,6 +86,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         panel.level = .floating;panel.hidesOnDeactivate=false;panel.isReleasedWhenClosed=false
         panel.collectionBehavior=[.canJoinAllSpaces,.fullScreenAuxiliary]
         panel.contentView=companionView;panel.setFrameAutosaveName("MoamonCompanion")
+        companionView.toggleFocus = { [weak self] in self?.togglePetFocus() }
         companionView.openGarden = { [weak self] in self?.showWindow() }
         companionView.care = { [weak self] in
             self?.showWindow()
@@ -94,7 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             UserDefaults.standard.set(Double(size),forKey:"companionSize")
             self.restoreCompanionPosition()
         }
-        companionView.toolTip=L("클릭해 돌보기 · 끌어서 이동 · 두 번 클릭해 정원 열기")
+        companionView.toolTip=L("클릭해 집중 시작·정지 · 오른쪽 클릭으로 메뉴 · 두 번 클릭해 정원")
         companionPanel=panel
         let size=UserDefaults.standard.double(forKey:"companionSize")==144 ? 144.0 : 96.0
         panel.setContentSize(NSSize(width:size,height:size))
@@ -122,6 +128,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     }
     let petStatus = NSMenuItem()
     let careAction = NSMenuItem()
+    let focusShortcut = NSMenuItem()
     var lockDescriptor: Int32 = -1
     var observers: [NSObjectProtocol] = []
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -139,8 +146,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     func fatal(_ message: String) { let alert=NSAlert(); alert.messageText=L("정원을 열지 못했어요"); alert.informativeText=message; alert.runModal(); NSApp.terminate(nil) }
     func createWindow() {
         let config = WKWebViewConfiguration()
+        if #available(macOS 14.0, *) {
+            config.preferences.inactiveSchedulingPolicy = .none
+        }
         let script = """
-        (()=>{const request=(action,payload={})=>{const reply=JSON.parse(prompt('__LOREHATCH_NATIVE__',JSON.stringify({action,...payload})));if(reply.error)throw Error(reply.error);return reply.value;};window.lorehatchDesktop={...request('status'),language:locale=>request('language',{locale}),companion:command=>request('companion',{command}),react:()=>request('react'),menu:(line,label,sprite,still)=>request('menu',{line,label,sprite,still}),storage:{getItem:key=>request('get',{key}),setItem:(key,value)=>request('set',{key,value}),removeItem:key=>request('remove',{key})},download:(name,base64)=>request('download',{name,base64})};})();
+        (()=>{const request=(action,payload={})=>{const reply=JSON.parse(prompt('__LOREHATCH_NATIVE__',JSON.stringify({action,...payload})));if(reply.error)throw Error(reply.error);return reply.value;};window.lorehatchDesktop={...request('status'),language:locale=>request('language',{locale}),companion:command=>request('companion',{command}),react:()=>request('react'),menu:(line,label,sprite,still,focusing)=>request('menu',{line,label,sprite,still,focusing}),storage:{getItem:key=>request('get',{key}),setItem:(key,value)=>request('set',{key,value}),removeItem:key=>request('remove',{key})},download:(name,base64)=>request('download',{name,base64})};})();
         """
         config.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentStart, forMainFrameOnly: true))
         web = WKWebView(frame: .zero, configuration: config); web.navigationDelegate=self; web.uiDelegate=self
@@ -162,6 +172,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     func buildMenus() {
         let menu=NSMenu(); let appItem=NSMenuItem(); let appMenu=NSMenu()
         appMenu.addItem(withTitle:L("모아몬에 관하여"),action:#selector(showAbout),keyEquivalent:"")
+        focusShortcut.title=L("같이 작업하기")
+        focusShortcut.target=self
+        focusShortcut.action=#selector(careFromMenu)
+        focusShortcut.keyEquivalent="f"
+        focusShortcut.keyEquivalentModifierMask=[.command,.shift]
+        appMenu.addItem(focusShortcut)
         appMenu.addItem(.separator()); appMenu.addItem(withTitle:L("모아몬 숨기기"),action:#selector(NSApplication.hide(_:)),keyEquivalent:"h")
         appMenu.addItem(withTitle:L("모아몬 종료"),action:#selector(NSApplication.terminate(_:)),keyEquivalent:"q"); appItem.submenu=appMenu; menu.addItem(appItem)
         let editItem=NSMenuItem(); let edit=NSMenu(title:L("편집"))
@@ -178,15 +194,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         status.addItem(withTitle:L("저장 폴더 열기"),action:#selector(showData),keyEquivalent:"")
         status.addItem(.separator());status.addItem(withTitle:L("종료"),action:#selector(NSApplication.terminate(_:)),keyEquivalent:"");statusItem.menu=status
     }
-    @objc func careFromMenu(){
-        showWindow()
-        web.evaluateJavaScript("window.dispatchEvent(new Event('moamon-care'))")
+    @objc func careFromMenu() { togglePetFocus() }
+
+    func togglePetFocus() {
+        web.evaluateJavaScript("window.moamonTogglePetFocus?.()") { [weak self] value, _ in
+            guard let self else { return }
+            switch value as? String {
+            case "paused": break
+            case "started":
+                if #unavailable(macOS 14.0) { self.showWindow() }
+            case "needs-garden":
+                self.showWindow()
+                self.web.evaluateJavaScript("window.dispatchEvent(new Event('moamon-care'))")
+            default:
+                self.showWindow()
+            }
+        }
     }
     @objc func showWindow(){window.makeKeyAndOrderFront(nil);NSApp.activate(ignoringOtherApps:true)}
     @objc func toggleFloating(_ sender:NSMenuItem){let enabled=window.level != .floating;window.level=enabled ? .floating : .normal;sender.state=enabled ? .on : .off}
     @objc func showData(){NSWorkspace.shared.open(store.folder)}
-    @objc func showAbout(){let alert=NSAlert();alert.messageText=L("모아몬 0.7.0");alert.informativeText=L("로컬 저장으로 키우는 작은 도트 펫 정원\n앱 창이 보일 때 함께한 시간을 반영해요.\n메뉴바에서 다시 열거나 항상 위에 둘 수 있어요.");alert.runModal()}
-    func windowShouldClose(_ sender: NSWindow)->Bool { web.evaluateJavaScript("window.dispatchEvent(new Event('lorehatch-suspend'))");sender.orderOut(nil);return false }
+    @objc func showAbout(){let alert=NSAlert();alert.messageText=L("모아몬 0.7.0");alert.informativeText=L("로컬 저장으로 키우는 작은 도트 펫 정원\n바탕화면 펫과 메뉴바에서 집중을 시작하거나 멈출 수 있어요.");alert.runModal()}
+    func windowShouldClose(_ sender: NSWindow)->Bool { web.evaluateJavaScript("window.dispatchEvent(new Event('moamon-garden-closed'))");sender.orderOut(nil);return false }
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows:Bool)->Bool{showWindow();return true}
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply {
         guard web != nil else{return .terminateNow}
@@ -234,19 +263,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
                 result=["visible":companionPanel.isVisible,"size":Int(companionPanel.frame.width)]
             case "react": companionView.celebrate()
             case "menu":
+                companionView.focusing = object["focusing"] as? Bool ?? false
                 guard let line=object["line"] as? String, let label=object["label"] as? String else{throw StoreError.invalidValue}
-                if let key=object["sprite"] as? String, key.range(of:"^(egg|[A-Z][0-9]{2}-(adult|baby))$",options:.regularExpression) != nil {
+                if let key=object["sprite"] as? String, key.range(of:"^(egg|[A-Z][0-9]{2}-(adult|baby|final))$",options:.regularExpression) != nil {
                     companionKey=key;companionStill=object["still"] as? Bool ?? false
                     companionView.showSprite(key,reduced:companionStill)
                 }
                 petStatus.title=String(line.prefix(80)); careAction.title=String(label.prefix(30))
+                focusShortcut.title=careAction.title
+                let focusing=companionView.focusing
+                statusItem.button?.image=NSImage(systemSymbolName:focusing ? "leaf.fill" : "leaf",accessibilityDescription:L(focusing ? "집중 중" : "모아몬"))
                 statusItem.button?.toolTip=petStatus.title
             case "language":
                 guard let locale=object["locale"] as? String,["en","ko"].contains(locale) else{throw StoreError.invalidValue}
                 UserDefaults.standard.set(locale,forKey:"moamonLanguage")
                 localizeMenu(NSApp.mainMenu);localizeMenu(statusItem.menu);window.title=L("모아몬")
-                companionView.toolTip=L("클릭해 돌보기 · 끌어서 이동 · 두 번 클릭해 정원 열기")
-            case "status": result = ["warning":store.warning,"blocked":store.blocked,"locale":moamonLocale()]
+                companionView.toolTip=L("클릭해 집중 시작·정지 · 오른쪽 클릭으로 메뉴 · 두 번 클릭해 정원")
+            case "status":
+                var backgroundFocus = false
+                if #available(macOS 14.0, *) { backgroundFocus = true }
+                result = ["warning":store.warning,"blocked":store.blocked,"locale":moamonLocale(),"backgroundFocus":backgroundFocus]
             case "get":result=try store.get(object["key"] as? String ?? "") as Any? ?? NSNull()
             case "set":guard let value=object["value"] as? String else{throw StoreError.invalidValue};try store.set(object["key"] as? String ?? "",value:value)
             case "remove":try store.set(object["key"] as? String ?? "",value:nil)
@@ -282,6 +318,16 @@ if CommandLine.arguments.contains("--activity-signal") {
         guard try recovered.get(key)=="{\"test\":1}",!recovered.warning.isEmpty else{throw StoreError.corrupt}
         do{try recovered.set("other",value:"{}");throw StoreError.corrupt}catch StoreError.invalidKey{}
         print("PASS: native atomic save, restart, backup recovery and key isolation")
+        let siteFolder = URL(fileURLWithPath: "/private/tmp", isDirectory: true)
+            .appendingPathComponent("lorehatch-site-test-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: siteFolder) }
+        try FileManager.default.createDirectory(at: siteFolder, withIntermediateDirectories: true)
+        let testPage = Data("<h1>Garden</h1>".utf8)
+        try testPage.write(to: siteFolder.appendingPathComponent("index.html"))
+        let testSite = try LocalSite(root: siteFolder)
+        guard testSite.bundledFile(named: "index.html") == testPage,
+              testSite.bundledFile(named: "../index.html") == nil else { throw StoreError.corrupt }
+        print("PASS: bundled files load through a macOS path alias")
     }catch{fputs("Native tests failed: \(error)\n",stderr);exit(1)}
 } else {
     let app=NSApplication.shared;let delegate=AppDelegate();app.delegate=delegate;app.setActivationPolicy(.regular);app.run()

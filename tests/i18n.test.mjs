@@ -21,7 +21,7 @@ test('language switching preserves progress and user-authored Korean names',()=>
 });
 test('locale fallback, counters, dynamic stories and source labels are localized',()=>{
  assert.equal(resolveLocale('ko-KR'),'ko');assert.equal(resolveLocale('fr-FR'),'en');
- assert.equal(t('모루잎의 새로운 모습을 확인해보세요.','en'),'Meet Moruip in a new grown form.');
+ assert.equal(t('새봄의 진화 모습을 만나보세요.','en'),'Saebom is ready to evolve.');
  assert.equal(t('부화 진행','en'),'Hatching progress');
  assert.equal(t('5분 30초','en'),'5m 30s');
  assert.equal(t('성장한 친구 돌보기','en'),'Care for your grown friend');

@@ -14,19 +14,19 @@ Choose an egg. Meet your companion. Build a garden of small, shared stories.
 
 </div>
 
-![The English Moamon garden with Kokodu, the ember puppy](docs/screenshots/v07-garden-en.jpg)
+![The English Moamon garden with Coco, the ember puppy](docs/screenshots/v07-garden-en.jpg)
 
 ## Your next break has a tiny face
 
-Moruip unfolds its leaf wings in the sun. Poru practices a careful landing. Kokodu greets your hand with a warm little nose.
+Saebom unfolds its leaf wings in the sun. Naru practices a careful landing. Coco greets your hand with a warm little nose.
 
-Your first egg hatches immediately. Choose **Work together** and keep the garden visible: your baby grows in **15 minutes**. Later eggs hatch in **5 minutes**. There is no hunger meter, lost streak, or penalty for taking a day off.
+Your first egg hatches immediately. Choose **Work together** and keep the garden visible: your pet is ready to evolve in **15 minutes**. Later eggs hatch in **5 minutes**. There is no hunger meter, lost streak, or penalty for taking a day off.
 
-**Choose an egg → hatch → work together → grow → discover a friendship.**
+**Choose an egg → hatch → work together → evolve → discover a friendship.**
 
 ## Thirty friends. Five places to call home.
 
-- **30 species, 60 appearances.** Every friend has a baby and grown form. A growth stage is not a separate species.
+- **30 species, 90 appearances.** Every friend has a baby, first evolution, and final form. An evolution stage is not a separate species.
 - **Five connected habitats.** Grow the six residents of each habitat to unlock the next: Three Springs Forest, Reed Marsh, Starlight Ridge, Shell Shore, and Breezy Meadow.
 - **15 friendship stories.** Grow and care for both friends in a pair to discover their shared ending.
 - **30 memory cards.** Help a friend in a short choice-based encounter. Wrong choices have no penalty.
@@ -34,18 +34,20 @@ Your first egg hatches immediately. Choose **Work together** and keep the garden
 
 ![All 30 original Moamon companions, grouped by habitat](docs/media/moamon-roster-en.svg)
 
-The longer-term ambition is 120 species. **This alpha contains 30**, each with one growth step after hatching. Combat and branching evolution are not implemented.
+The longer-term ambition is 120 species. **This alpha contains 30**, each with two evolutions after hatching. Combat and branching evolution are not implemented.
 
 ## Start in a minute
 
 1. [Open the English garden](https://dayainow.github.io/lorehatch/?lang=en) and choose a fire, water, or grass egg.
-2. Hatch your friend, then choose **Work together**. **No limit** keeps the session going until you pause or growth is ready.
+2. Hatch your friend, then choose **Work together**. **No limit** keeps the session going until you pause or evolution is ready.
 3. Open the field guide to discover its care reaction. Visit Memories for its little request.
-4. Reveal its grown form, care for it again, and find the friend in its relationship hint.
+4. Select **Evolve** to see both forms side by side. You can revisit them in **My pets** and the field guide.
 
-The [quick demo](https://dayainow.github.io/lorehatch/?lang=en&mode=demo) uses a separate save, with 15-second hatching and 30-second growth. Regular growth is capped at 150 credited minutes per day.
+The [quick demo](https://dayainow.github.io/lorehatch/?lang=en&mode=demo) uses a separate save, with 15-second hatching and 30-second evolution. Regular growth is capped at 150 credited minutes per day.
 
-**Manual growth counts only while the garden view is visible and the session is running.** Switching tabs, hiding the view, or sleeping pauses it. Background computer-usage tracking is not implemented.
+**On a phone**, use the bottom controls to hatch, care, or start and pause growth, even while looking through the field guide. Supported mobile browsers keep the screen awake during an active session.
+
+Web growth pauses when you switch tabs or lock the screen. On macOS 14+, the native app can keep a session running with the garden window closed. Sleep pauses the session.
 
 ## Pick your language. Keep your garden.
 
@@ -57,7 +59,7 @@ Use the language button at the top to switch between English and Korean. Navigat
 
 The browser is the primary public alpha. The web ZIP is a static-site bundle for local hosting, not a desktop installer. The source ZIP contains source code.
 
-**Mac development build:** a floating companion, menu-bar controls, size and position preferences, and local save recovery are implemented. Local universal packages target macOS 13+ on Apple Silicon and Intel. They are ad-hoc signed, **not Developer ID signed or notarized**, and are not presented as a ready-to-install public Mac release. Moamon is not listed in an app store.
+**Mac development build:** click the desktop pet to start or pause focus, double-click to open the garden, or right-click for care and size controls. The menu bar also starts or pauses focus. On macOS 14+, a running session continues with the garden window closed. Use Shift–Command–F when Moamon is active, or the desktop pet and menu bar while in another app. Local universal packages target macOS 13+ on Apple Silicon and Intel. They are ad-hoc signed, **not Developer ID signed or notarized**, and are not presented as a ready-to-install public Mac release. Moamon is not listed in an app store.
 
 To run the source with Node.js 22+:
 
@@ -118,3 +120,5 @@ Presentation references include [VS Code Pets](https://github.com/tonybaloney/vs
 ---
 
 **One egg. One little friend. A reason to come back.**
+
+Final evolution: open an evolved pet in My pets and choose **Raise the final form**. It takes 30 credited minutes (60 seconds in the demo). Existing evolved pets remain eligible. All 30 final forms have individually composed pixel designs.

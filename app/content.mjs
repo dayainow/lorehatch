@@ -1,9 +1,9 @@
 import {expansion} from './expansion.mjs';
 import {newSpecies} from './new-species.mjs';
 export const content = {
- D01:{ name:'모루잎', kind:'숲용', color:'sage', description:'씨앗처럼 둥근 얼굴, 접힌 잎귀와 짧은 덩굴 꼬리의 낮잠꾸러기.',  adult:'작은 잎날개가 넓게 자랐어요. 이제 정원 그늘에서 다른 친구들을 기다려요.' },
- G01:{ name:'포루', kind:'페가수스', color:'sky', description:'물방울 앞머리와 작은 물결 날개를 가진 호기심 많은 아기 말.',  adult:'날개를 활짝 펼칠 수 있게 됐어요. 그래도 착지할 땐 조금 서툴러요.' },
- G02:{ name:'코코두', kind:'불씨 강아지', color:'clay', description:'숯빛 귀와 작은 불씨 꼬리를 가진, 사람을 잘 따르는 아기 강아지.',  adult:'불꽃처럼 포근한 목털이 자랐어요. 작은 꼬리 불빛으로 친구의 귀갓길을 밝혀요.' }
+ D01:{ name:'새봄', kind:'숲용', color:'sage', description:'씨앗처럼 둥근 얼굴, 접힌 잎귀와 짧은 덩굴 꼬리의 낮잠꾸러기.',  adult:'작은 잎날개가 넓게 자랐어요. 이제 정원 그늘에서 다른 친구들을 기다려요.' },
+ G01:{ name:'나루', kind:'페가수스', color:'sky', description:'물방울 앞머리와 작은 물결 날개를 가진 호기심 많은 아기 말.',  adult:'날개를 활짝 펼칠 수 있게 됐어요. 그래도 착지할 땐 조금 서툴러요.' },
+ G02:{ name:'코코', kind:'불씨 강아지', color:'clay', description:'숯빛 귀와 작은 불씨 꼬리를 가진, 사람을 잘 따르는 아기 강아지.',  adult:'불꽃처럼 포근한 목털이 자랐어요. 작은 꼬리 불빛으로 친구의 귀갓길을 밝혀요.' }
 };
 content.D02 = { name:'호롱', kind:'불꽃용', color:'clay', description:'두 볼을 부풀려 꼬리 끝의 불씨를 데우는 작은 용.', adult:'등에 돋은 불꽃 갈기로 길 잃은 친구에게 길을 밝혀줘요.' };
 export const starters = ['G02','G01','D01'];

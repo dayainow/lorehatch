@@ -40,7 +40,7 @@
     "F05",
     "F06"
   ],
-  "mvp_basic_sprite_frames": 122,
+  "mvp_basic_sprite_frames": 182,
   "progress_source": "active_session_seconds",
   "ai_activity_experimental": {
     "provider": "claude_code_stop_hook",
@@ -48,5 +48,6 @@
     "max_event_age_seconds": 60,
     "manual_session_overlap": "skip",
     "historical_credit": false
-  }
+  },
+  "final_evolution_minutes": 30
 }

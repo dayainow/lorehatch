@@ -12,7 +12,12 @@ export function initialState(mode = 'normal', day = dayKey()) {
   if (!MODES[mode]) throw new Error('잘못된 모드입니다.');
   return { schemaVersion: SAVE_VERSION, balanceVersion: 1, mode, phase: 'idle', active: null, pets: [], partner: null, bank: 0, day, daily: 0, total: 0, tutorialClaimed: false, settings: { reducedMotion: false, decoration: 'flowers' } };
 }
-export function targetSeconds(s) { return ['incubating','hatch_ready'].includes(s.phase) ? MODES[s.mode].hatch : MODES[s.mode].growth; }
+export function beginFinal(state,id){
+ const pet=state.pets.find(p=>p.id===id);
+ if(!pet||pet.stage!=='adult'||pet.finalForm||!['idle','complete'].includes(state.phase))return state;
+ return {...state,phase:'raising',active:{id,progress:0},partner:id};
+}
+export function targetSeconds(s) { return ['incubating','hatch_ready'].includes(s.phase) ? MODES[s.mode].hatch : (s.pets.find(p=>p.id===s.active?.id)?.stage==='adult'?MODES[s.mode].growth*2:MODES[s.mode].growth); }
 function applyBank(s) {
   if (!['incubating', 'raising'].includes(s.phase)) return s;
   const take = Math.min(s.bank, targetSeconds(s) - s.active.progress);
@@ -37,7 +42,7 @@ export function confirmReady(state, now = new Date().toISOString()) {
     s.active.progress = 0; s.phase = 'raising';
   } else {
     const p = s.pets.find(p => p.id === s.active.id);
-    p.stage = 'adult'; p.grownAt = now;
+    if(p.stage==='adult'){p.finalForm=true;p.finalAt=now;}else{p.stage='adult';p.grownAt=now;}
     s.active = null; s.phase = s.pets.length === IDS.length ? 'complete' : 'idle';
   }
   return applyBank(s);
@@ -76,11 +81,12 @@ export function parseSave(text, expectedMode) {
   if(s.balanceVersion!==undefined&&s.balanceVersion!==1)fail();
   const legacy=s.mode==='normal'&&s.balanceVersion===undefined;
   const cfg = legacy?{hatch:1500,growth:4500,cap:9000}:MODES[s.mode];
-  const validationTarget=['incubating','hatch_ready'].includes(s.phase)?cfg.hatch:cfg.growth;
+  const validationTarget=['incubating','hatch_ready'].includes(s.phase)?cfg.hatch:cfg.growth*((Array.isArray(s.pets)?s.pets:[]).find(p=>p?.id===s.active?.id)?.stage==='adult'?2:1);
   if(s.activity!==undefined&&(!s.activity||typeof s.activity.enabled!=='boolean'||!Number.isSafeInteger(s.activity.lastBucket)||s.activity.lastBucket<0||!Number.isSafeInteger(s.activity.since)||s.activity.since<0))fail();
   if (!['idle','incubating','hatch_ready','raising','growth_ready','complete'].includes(s.phase)) fail();
   if (!Array.isArray(s.pets) || s.pets.length > IDS.length || new Set(s.pets.map(p=>p?.id)).size !== s.pets.length) fail();
   for (const p of s.pets) if (!p || !IDS.includes(p.id) || !['baby','adult'].includes(p.stage) || typeof p.nickname !== 'string' || p.nickname.length > 20 || !validDate(p.hatchedAt) || (p.stage === 'adult' ? !validDate(p.grownAt) : p.grownAt !== null)) fail();
+  for(const p of s.pets)if(p.finalForm!==undefined&&(p.finalForm!==true||p.stage!=='adult'||!validDate(p.finalAt)))fail();
   if(s.memories!==undefined&&(!Array.isArray(s.memories)||s.memories.length>IDS.length||new Set(s.memories).size!==s.memories.length||s.memories.some(id=>!s.pets.some(p=>p.id===id))))fail();
   for(const p of s.pets)if(p.care!==undefined&&(!Array.isArray(p.care)||p.care.length>2||new Set(p.care).size!==p.care.length||p.care.some(stage=>stage!=='baby'&&(stage!=='adult'||p.stage!=='adult'))))fail();
   if (s.partner !== null && !s.pets.some(p=>p.id===s.partner)) fail();
@@ -94,7 +100,7 @@ export function parseSave(text, expectedMode) {
     if (s.phase.endsWith('ready') && s.active.progress !== validationTarget) fail();
     if (['incubating','raising'].includes(s.phase) && s.active.progress >= validationTarget) fail();
     const pet = s.pets.find(p=>p.id===s.active.id);
-    if (['incubating','hatch_ready'].includes(s.phase) ? !!pet : pet?.stage !== 'baby') fail();
+    if (['incubating','hatch_ready'].includes(s.phase) ? !!pet : (!pet||pet.finalForm)) fail();
   } else if (s.active !== null) fail();
   if (s.pets.some(p=>p.stage==='baby' && (p.id!==s.active?.id || !['raising','growth_ready'].includes(s.phase)))) fail();
   if (!s.tutorialClaimed && (s.phase !== 'idle' || s.pets.length || s.total || s.bank)) fail();
@@ -108,7 +114,7 @@ export function parseSave(text, expectedMode) {
   }
   // Return only known fields; never retain arbitrary imported properties.
   return { schemaVersion: SAVE_VERSION, balanceVersion:1, mode:s.mode, phase:s.phase, active:s.active ? { id:s.active.id, progress:s.active.progress }:null,
-    pets:s.pets.map(p=>({id:p.id,stage:p.stage,nickname:p.nickname,hatchedAt:p.hatchedAt,grownAt:p.grownAt,...(p.care?{care:[...p.care]}:{})})), partner:s.partner,
+    pets:s.pets.map(p=>({id:p.id,stage:p.stage,nickname:p.nickname,hatchedAt:p.hatchedAt,grownAt:p.grownAt,...(p.finalForm?{finalForm:true,finalAt:p.finalAt}:{}),...(p.care?{care:[...p.care]}:{})})), partner:s.partner,
     bank:s.bank, day:s.day, daily:s.daily, total:s.total, tutorialClaimed:s.tutorialClaimed,
     ...(s.activity?{activity:{enabled:s.activity.enabled,lastBucket:s.activity.lastBucket,since:s.activity.since}}:{}),
     ...(s.memories?{memories:[...s.memories]}:{}),

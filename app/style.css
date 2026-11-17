@@ -149,3 +149,71 @@ html[lang="en"] .brand small{letter-spacing:1.3px}
 @media(max-width:760px){.header{height:auto;min-height:100px;flex-wrap:wrap;gap:8px;padding:14px 16px}.header nav{order:3;width:100%;justify-content:center}.header .brand{margin-right:auto}.language-toggle{min-height:40px}.nav-button{min-height:40px}.focus-panel .button-time{white-space:nowrap}.scene-counter{white-space:nowrap}}
 
 html[lang="en"] .duration-options button{white-space:nowrap;padding-inline:4px;font-size:11px}
+
+.quick-actions {
+  position: fixed;
+  z-index: 20;
+  inset-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  margin-inline: auto;
+  width: min(510px, calc(100% - 32px));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--paper);
+  border: 1px solid #cbd3bb;
+  border-radius: 14px;
+  box-shadow: 0 5px 20px #263e3424;
+}
+.workspace ~ .quick-actions { display: none; }
+.quick-status { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; padding-inline-start: 5px; }
+.quick-status > span:last-child { min-width: 0; }
+.quick-status strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.quick-status small { display: block; color: #52654c; font-size: 11px; font-variant-numeric: tabular-nums; }
+.quick-dot { width: 7px; height: 7px; flex: none; background: #9aa78b; }
+.quick-actions[data-running="true"] .quick-dot { background: #315a42; box-shadow: 0 0 0 3px #c9dcbc; }
+.quick-actions button { min-height: 44px; padding: 8px 10px; font-size: 12px; max-width: 46%; }
+#app:has(.quick-actions):not(:has(.workspace)) { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+#app:has(.quick-actions):not(:has(.workspace)) #toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
+@media (max-width:760px) {
+  .workspace ~ .quick-actions { display: flex; }
+  #app:has(.quick-actions) { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
+  #app:has(.quick-actions) #toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .scene { min-height: 0; aspect-ratio: 1.32; }
+  .focus-panel .duration-options button { min-height: 44px; }
+}
+
+/* Show both forms at the same scale in the field guide and evolution reveal. */
+dialog[data-kind=evolution]{max-width:500px}
+.evolution-forms{display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:8px;align-items:center;margin:18px 0}
+.evolution-form{display:grid;gap:6px;text-align:center;min-width:0;padding:4px 4px 8px;border:1px solid transparent;border-radius:10px;font-size:12px;color:#435f44}
+.evolution-form[aria-pressed=true]{border-color:#6f8c67;background:#e7eddd}
+.evolution-form:disabled{opacity:1;color:#596353}
+.evolution-art{display:grid;place-items:center;aspect-ratio:1.15;border-radius:6px;overflow:hidden}
+.evolution-art .sprite{width:min(100%,144px);height:auto;aspect-ratio:1}
+.evolution-arrow{display:grid;place-items:center;color:#597254}
+.evolution-arrow svg{width:20px;height:20px}
+.evolution-hint{margin:-2px 0 14px}
+dialog[data-kind=evolution] .evolution-form:last-child .sprite{animation:arrival .6s ease-out}
+dialog[data-kind=evolution] .secondary{margin-top:8px}
+.evolution-forms{grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr) 16px minmax(0,1fr);gap:4px}
+dialog[data-kind=detail],dialog[data-kind=evolution]{max-width:640px}
+.evolution-form{font-size:11px}
+@media(max-width:420px){.evolution-forms{gap:1px;grid-template-columns:minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr)}.evolution-form{padding:2px;font-size:10px}.evolution-arrow svg{width:12px}}
+
+/* Pet acting: long idle rests, brief focused nods, three affectionate responses. */
+.scene-pet>.sprite{transform-origin:50% 92%}
+.scene-pet[data-mood=idle]>.sprite{animation:pet-idle-life 19s steps(2,end) infinite}
+.scene-pet[data-mood=focus]>.sprite{animation:pet-working 4s steps(2,end) infinite}
+.scene-pet[data-mood=focus]::after{content:"···";position:absolute;right:5%;top:0;color:#f3efce;background:#294c3b;padding:0 8px;border-radius:4px;font:700 20px monospace}
+.scene-pet.petted[data-affection=bounce]>.sprite{animation:pet-love-bounce 1.4s steps(3,end) both}
+.scene-pet.petted[data-affection=nuzzle]>.sprite{animation:pet-love-nuzzle 1.4s steps(3,end) both}
+.scene-pet.petted[data-affection=wiggle]>.sprite{animation:pet-love-wiggle 1.4s steps(3,end) both}
+@keyframes pet-idle-life{0%,25%,50%,70%,100%{transform:translateY(0)}12%,38%{transform:translateY(-2px)}74%{transform:translateX(-3px) rotate(-3deg)}78%{transform:translateX(3px) rotate(3deg)}82%{transform:translateX(0)}90%,96%{transform:scaleY(.95)}}
+@keyframes pet-working{0%,82%,100%{transform:translateY(0)}88%,94%{transform:translateY(2px) scaleY(.98)}}
+@keyframes pet-love-bounce{0%,35%,70%,100%{transform:translateY(0)}18%,52%{transform:translateY(-10px)}80%{transform:scale(1.04,.96)}}
+@keyframes pet-love-nuzzle{0%,100%{transform:rotate(0)}22%,65%{transform:translateX(-4px) rotate(-8deg)}42%,82%{transform:translateX(4px) rotate(5deg)}}
+@keyframes pet-love-wiggle{0%,100%{transform:scale(1)}20%,60%{transform:scale(1.08,.92) rotate(-4deg)}40%,80%{transform:scale(.96,1.04) rotate(4deg)}}
+.reduce-motion .scene-pet>.sprite{animation:none!important;transform:none!important}
+@media(prefers-reduced-motion:reduce){.scene-pet>.sprite{animation:none!important;transform:none!important}}
